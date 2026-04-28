@@ -1,0 +1,61 @@
+{% extends 'dashboard/layout.html' %}
+{% block page_title %}Abonnement{% endblock %}
+{% block content %}
+<div class="max-w-xl space-y-6">
+
+  {% if current_user.is_subscribed() %}
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="text-2xl">✅</span>
+      <div>
+        <p class="font-semibold text-gray-900">Abonnement actif</p>
+        {% if current_user.subscription and current_user.subscription.current_period_end %}
+        <p class="text-sm text-gray-500">
+          Renouvellement le {{ current_user.subscription.current_period_end.strftime('%d/%m/%Y') }}
+        </p>
+        {% elif current_user.trial_ends_at %}
+        <p class="text-sm text-amber-600">
+          Essai gratuit jusqu'au {{ current_user.trial_ends_at.strftime('%d/%m/%Y') }}
+        </p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="bg-gray-50 rounded-xl p-4 mb-6 text-sm text-gray-600 space-y-1">
+      <div class="flex justify-between">
+        <span>Plan</span><span class="font-medium">Vyranos Pro</span>
+      </div>
+      <div class="flex justify-between">
+        <span>Tarif</span><span class="font-medium">30€/mois</span>
+      </div>
+    </div>
+
+    {% if current_user.stripe_customer_id and 'test' not in (current_user.stripe_customer_id or '') %}
+    <a href="{{ url_for('billing.portal') }}"
+      class="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 border border-indigo-200 hover:border-indigo-300 px-5 py-2.5 rounded-lg transition">
+      Gérer mon abonnement →
+    </a>
+    {% endif %}
+  </div>
+
+  {% else %}
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
+    <p class="text-4xl mb-4">💳</p>
+    <h2 class="font-bold text-xl mb-2">Activez votre abonnement</h2>
+    <p class="text-gray-500 text-sm mb-6">30€/mois — annulez quand vous voulez</p>
+    <ul class="text-left space-y-2 mb-8 max-w-xs mx-auto">
+      {% for item in ['Page landing publique', 'Réservations en ligne', 'Tableau de bord complet', 'Support inclus'] %}
+      <li class="flex items-center gap-2 text-sm text-gray-600">
+        <span class="text-green-500">✓</span> {{ item }}
+      </li>
+      {% endfor %}
+    </ul>
+    <a href="{{ url_for('billing.checkout') }}"
+      class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 py-3 rounded-xl transition">
+      Activer l'abonnement →
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

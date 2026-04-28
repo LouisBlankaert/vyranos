@@ -1,0 +1,495 @@
+{% extends 'dashboard/layout.html' %}
+{% block page_title %}Agenda{% endblock %}
+
+{% block head %}
+<style>
+  :root { --primary: {{ business.couleur_primaire or '#6366f1' }}; }
+  .rdv-confirmed {
+    background: color-mix(in srgb, var(--primary) 12%, white);
+    border-left: 3px solid var(--primary);
+    color: color-mix(in srgb, var(--primary) 70%, black);
+  }
+  .rdv-cancelled {
+    background: #f9fafb;
+    border-left: 3px solid #e5e7eb;
+    color: #9ca3af;
+  }
+  .today-header { color: var(--primary); }
+  .today-dot { background: var(--primary); }
+  .rdv-card { transition: opacity .15s, transform .15s; }
+  .rdv-card:hover { opacity: .85; transform: translateY(-1px); }
+  .hour-row { height: 64px; border-top: 1px solid #f3f4f6; }
+  .half-line { position: absolute; top: 32px; left: 0; right: 0; border-top: 1px dashed #f3f4f6; pointer-events: none; }
+  .rdv-blocage {
+    background: repeating-linear-gradient(
+      45deg,
+      #f9fafb,
+      #f9fafb 4px,
+      #f3f4f6 4px,
+      #f3f4f6 8px
+    );
+    border-left: 3px solid #9ca3af;
+    color: #6b7280;
+  }
+  .btn-primary { background: var(--primary); }
+  .btn-primary:hover { opacity: .9; }
+  input:focus, select:focus { outline: none; box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 25%, transparent); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Données JSON pour JS -->
+<script>
+const RESERVATIONS = [
+  {% for r in reservations %}
+  {
+    id: {{ r.id }},
+    date: "{{ r.date.strftime('%Y-%m-%d') }}",
+    creneau: "{{ r.creneau }}",
+    duree: {{ r.service.duree_minutes }},
+    prenom: "{{ r.prenom|replace('"', '\\"') }}",
+    nom: "{{ r.nom|replace('"', '\\"') }}",
+    service: "{{ r.service.nom|replace('"', '\\"') }}",
+    service_id: {{ r.service_id }},
+    statut: "{{ r.statut }}",
+    email: "{{ r.email|replace('"', '\\"') }}",
+    telephone: "{{ r.telephone or '' }}"
+  }{% if not loop.last %},{% endif %}
+  {% endfor %}
+];
+const SERVICES = [
+  {% for s in services %}
+  { id: {{ s.id }}, nom: "{{ s.nom|replace('"', '\\"') }}" }{% if not loop.last %},{% endif %}
+  {% endfor %}
+];
+const BLOCAGES = [
+  {% for b in blocages %}
+  {
+    date: "{{ b.date.strftime('%Y-%m-%d') }}",
+    debut: "{{ b.debut }}",
+    fin: "{{ b.fin }}",
+    motif: "{{ b.motif|replace('"', '\\"') }}"
+  }{% if not loop.last %},{% endif %}
+  {% endfor %}
+];
+const EDIT_URL_TPL   = "{{ url_for('dashboard.edit_reservation', rid=0) }}".replace('/0/', '/{id}/');
+const DELETE_URL_TPL = "{{ url_for('dashboard.delete_reservation', rid=0) }}".replace('/0/', '/{id}/');
+const STATUT_URL_TPL = "{{ url_for('dashboard.update_statut', rid=0) }}".replace('/0/', '/{id}/');
+</script>
+
+<div class="space-y-6">
+
+  <!-- ── BARRE DE NAVIGATION SEMAINE ───────────────── -->
+  <div class="flex flex-wrap items-center gap-3">
+    <div class="flex items-center gap-1 bg-white border border-gray-100 rounded-xl shadow-sm p-1">
+      <button onclick="prevWeek()"
+        class="w-8 h-8 rounded-lg hover:bg-gray-50 flex items-center justify-center text-gray-500 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <span id="week-label" class="text-sm font-semibold text-gray-900 px-2 min-w-[200px] text-center"></span>
+      <button onclick="nextWeek()"
+        class="w-8 h-8 rounded-lg hover:bg-gray-50 flex items-center justify-center text-gray-500 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+    <button onclick="goToday()"
+      class="text-sm font-medium px-4 py-2 rounded-xl border border-gray-100 bg-white hover:bg-gray-50 text-gray-600 shadow-sm transition">
+      Aujourd'hui
+    </button>
+    <!-- Filtres -->
+    <div class="flex gap-1 bg-white border border-gray-100 rounded-xl shadow-sm p-1 ml-auto">
+      {% for val, label in [('', 'Tous'), ('confirmé', 'Confirmés'), ('annulé', 'Annulés')] %}
+      <button onclick="setFilter('{{ val }}')" data-filter="{{ val }}"
+        class="filter-btn text-xs font-semibold px-3 py-1.5 rounded-lg transition {{ 'bg-indigo-600 text-white' if loop.first else 'text-gray-500 hover:bg-gray-50' }}">
+        {{ label }}
+      </button>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- ── CALENDRIER SEMAINE ────────────────────────── -->
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+    <!-- En-têtes jours -->
+    <div class="grid border-b border-gray-100" style="grid-template-columns: 56px repeat(7, 1fr);">
+      <div class="border-r border-gray-100"></div>
+      {% for i in range(7) %}
+      <div id="day-header-{{ i }}"
+        class="py-3 text-center border-r border-gray-100 last:border-0 cursor-pointer select-none">
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Corps scrollable -->
+    <div class="overflow-y-auto" style="max-height: 560px;" id="cal-body">
+      <div class="grid relative" style="grid-template-columns: 56px repeat(7, 1fr);">
+
+        <!-- Colonne des heures -->
+        <div class="border-r border-gray-100">
+          {% for h in range(7, 22) %}
+          <div class="hour-row flex items-start justify-end pr-2 pt-1">
+            <span class="text-xs text-gray-300 font-medium">{{ '%02d'|format(h) }}h</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Colonnes jours -->
+        {% for i in range(7) %}
+        <div id="day-col-{{ i }}"
+          class="relative border-r border-gray-100 last:border-0">
+          <!-- lignes d'heures -->
+          {% for h in range(7, 22) %}
+          <div class="hour-row relative">
+            <div class="half-line"></div>
+          </div>
+          {% endfor %}
+          <!-- Conteneur RDV (positionné en absolu par-dessus) -->
+          <div id="rdv-col-{{ i }}"
+            class="absolute inset-0 pointer-events-none"
+            style="top:0;">
+          </div>
+        </div>
+        {% endfor %}
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PAUSES & BLOCAGES ──────────────────────────── -->
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h2 class="font-semibold text-gray-900">Pauses & indisponibilités</h2>
+      <p class="text-xs text-gray-400 mt-0.5">Bloquez des créneaux pour vos pauses, congés ou rendez-vous personnels.</p>
+    </div>
+    <div class="px-6 py-5 border-b border-gray-50">
+      <form method="POST" action="{{ url_for('dashboard.add_blocage') }}" class="flex flex-wrap gap-3 items-end">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Date</label>
+          <input type="date" name="date" required
+            class="rounded-xl border border-gray-200 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">De</label>
+          <input type="time" name="debut" value="12:00" required
+            class="rounded-xl border border-gray-200 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">À</label>
+          <input type="time" name="fin" value="14:00" required
+            class="rounded-xl border border-gray-200 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Motif</label>
+          <input type="text" name="motif" placeholder="Pause déjeuner"
+            class="rounded-xl border border-gray-200 px-3 py-2 text-sm w-40">
+        </div>
+        <button type="submit"
+          class="bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium px-5 py-2 rounded-xl transition">
+          + Ajouter
+        </button>
+      </form>
+    </div>
+    {% if blocages %}
+    <div class="divide-y divide-gray-50">
+      {% for b in blocages %}
+      <div class="px-6 py-3 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <span class="text-lg">🚫</span>
+          <div>
+            <p class="text-sm font-medium text-gray-900">{{ b.motif }}</p>
+            <p class="text-xs text-gray-400">{{ b.date.strftime('%d/%m/%Y') }} · {{ b.debut }} → {{ b.fin }}</p>
+          </div>
+        </div>
+        <form method="POST" action="{{ url_for('dashboard.delete_blocage', bid=b.id) }}">
+          <button type="submit"
+            class="text-xs text-red-400 hover:text-red-600 px-3 py-1.5 rounded-lg border border-red-50 hover:border-red-200 transition">
+            Supprimer
+          </button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="px-6 py-5 text-sm text-gray-400">Aucune pause planifiée.</div>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- ── MODAL RÉSERVATION ──────────────────────────────── -->
+<div id="modal-overlay"
+  class="fixed inset-0 bg-black/30 z-40 hidden"
+  onclick="closeModal()">
+</div>
+<div id="modal"
+  class="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md bg-white shadow-2xl transform translate-x-full transition-transform duration-300 overflow-y-auto">
+
+  <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+    <h3 class="font-bold text-gray-900" id="modal-title">Rendez-vous</h3>
+    <button onclick="closeModal()" class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-400 transition">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="px-6 py-5 space-y-5">
+    <!-- Statut badge -->
+    <div id="modal-statut-badge"></div>
+
+    <!-- Formulaire d'édition -->
+    <form id="modal-form" method="POST">
+      <div class="space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1.5">Prénom</label>
+            <input type="text" name="prenom" id="m-prenom"
+              class="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1.5">Nom</label>
+            <input type="text" name="nom" id="m-nom"
+              class="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1.5">Date</label>
+            <input type="date" name="date" id="m-date"
+              class="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1.5">Heure</label>
+            <input type="time" name="creneau" id="m-creneau"
+              class="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm">
+          </div>
+          <div class="col-span-2">
+            <label class="block text-xs font-medium text-gray-500 mb-1.5">Service</label>
+            <select name="service_id" id="m-service"
+              class="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm bg-white">
+              {% for s in services %}
+              <option value="{{ s.id }}">{{ s.nom }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1.5">Email</label>
+            <input type="email" name="email" id="m-email"
+              class="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1.5">Téléphone</label>
+            <input type="tel" name="telephone" id="m-telephone"
+              class="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm">
+          </div>
+          <div class="col-span-2">
+            <label class="block text-xs font-medium text-gray-500 mb-1.5">Statut</label>
+            <select name="statut" id="m-statut"
+              class="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm bg-white">
+              <option value="confirmé">Confirmé</option>
+              <option value="annulé">Annulé</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit"
+          class="btn-primary w-full py-3 rounded-xl text-white font-semibold text-sm transition">
+          Enregistrer les modifications
+        </button>
+      </div>
+    </form>
+
+    <div class="border-t border-gray-100 pt-4">
+      <form id="modal-delete-form" method="POST">
+        <button type="submit"
+          onclick="return confirm('Supprimer ce rendez-vous ?')"
+          class="w-full py-3 rounded-xl text-red-500 font-semibold text-sm border border-red-100 hover:bg-red-50 transition">
+          Supprimer ce rendez-vous
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ── Constantes ──────────────────────────────────────────
+const START_HOUR = 7;
+const HOUR_PX    = 64; // hauteur en px par heure (= .hour-row height)
+const DAYS_FR    = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+const MONTHS_FR  = ['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc'];
+const MONTHS_FULL = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+let weekStart   = getMonday(new Date());
+let activeFilter = '';
+
+// ── Utilitaires date ────────────────────────────────────
+function getMonday(d) {
+  const date = new Date(d);
+  const day  = date.getDay();
+  date.setDate(date.getDate() - (day === 0 ? 6 : day - 1));
+  date.setHours(0,0,0,0);
+  return date;
+}
+function addDays(d, n) {
+  const r = new Date(d);
+  r.setDate(r.getDate() + n);
+  return r;
+}
+function fmtDate(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function fmtShort(d) {
+  return `${d.getDate()} ${MONTHS_FR[d.getMonth()]}`;
+}
+function todayStr() { return fmtDate(new Date()); }
+
+// ── Navigation semaine ──────────────────────────────────
+function prevWeek() { weekStart = addDays(weekStart, -7); renderWeek(); }
+function nextWeek() { weekStart = addDays(weekStart,  7); renderWeek(); }
+function goToday()  { weekStart = getMonday(new Date()); renderWeek(); }
+
+// ── Filtre ──────────────────────────────────────────────
+function setFilter(val) {
+  activeFilter = val;
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    const active = btn.dataset.filter === val;
+    btn.className = `filter-btn text-xs font-semibold px-3 py-1.5 rounded-lg transition ${active ? 'bg-indigo-600 text-white' : 'text-gray-500 hover:bg-gray-50'}`;
+  });
+  renderWeek();
+}
+
+// ── Rendu semaine ───────────────────────────────────────
+function renderWeek() {
+  const weekEnd = addDays(weekStart, 6);
+  const td = todayStr();
+
+  // Label semaine
+  const startM = weekStart.getMonth(), endM = weekEnd.getMonth();
+  let label;
+  if (startM === endM) {
+    label = `${weekStart.getDate()} – ${weekEnd.getDate()} ${MONTHS_FULL[startM]} ${weekStart.getFullYear()}`;
+  } else {
+    label = `${fmtShort(weekStart)} – ${fmtShort(weekEnd)} ${weekEnd.getFullYear()}`;
+  }
+  document.getElementById('week-label').textContent = label;
+
+  for (let i = 0; i < 7; i++) {
+    const day    = addDays(weekStart, i);
+    const ds     = fmtDate(day);
+    const isToday = ds === td;
+
+    // Header
+    const hdr = document.getElementById(`day-header-${i}`);
+    hdr.innerHTML = `
+      <div class="text-xs font-semibold uppercase ${isToday ? 'today-header' : 'text-gray-400'}">${DAYS_FR[i]}</div>
+      <div class="flex items-center justify-center mx-auto mt-0.5 w-7 h-7 rounded-full text-sm font-bold
+        ${isToday ? 'today-dot text-white' : 'text-gray-700'}">${day.getDate()}</div>
+    `;
+
+    // Rendez-vous du jour
+    const col = document.getElementById(`rdv-col-${i}`);
+    col.innerHTML = '';
+    col.style.pointerEvents = 'auto';
+
+    const rdvs = RESERVATIONS.filter(r =>
+      r.date === ds && (activeFilter === '' || r.statut === activeFilter)
+    );
+
+    rdvs.forEach(r => {
+      const [h, m] = r.creneau.split(':').map(Number);
+      const top    = ((h - START_HOUR) * 60 + m) * (HOUR_PX / 60);
+      const height = Math.max(r.duree * (HOUR_PX / 60), 28);
+
+      const card = document.createElement('div');
+      card.className = `rdv-card absolute left-1 right-1 rounded-lg px-2 py-1 cursor-pointer overflow-hidden text-left ${r.statut === 'confirmé' ? 'rdv-confirmed' : 'rdv-cancelled'}`;
+      card.style.top    = `${top}px`;
+      card.style.height = `${height}px`;
+      card.style.zIndex = '10';
+
+      const showService = height >= 44;
+      card.innerHTML = `
+        <div class="text-xs font-bold leading-tight truncate">${r.prenom} ${r.nom}</div>
+        ${showService ? `<div class="text-xs leading-tight truncate opacity-70">${r.service}</div>` : ''}
+        <div class="text-xs leading-tight opacity-60">${r.creneau}</div>
+      `;
+      card.addEventListener('click', () => openModal(r));
+      col.appendChild(card);
+    });
+
+    // Pauses / blocages
+    BLOCAGES.filter(b => b.date === ds).forEach(b => {
+      const [bh, bm] = b.debut.split(':').map(Number);
+      const [fh, fm] = b.fin.split(':').map(Number);
+      const top    = ((bh - START_HOUR) * 60 + bm) * (HOUR_PX / 60);
+      const duree  = (fh * 60 + fm) - (bh * 60 + bm);
+      const height = Math.max(duree * (HOUR_PX / 60), 28);
+
+      const card = document.createElement('div');
+      card.className = 'rdv-card rdv-blocage absolute left-1 right-1 rounded-lg px-2 py-1 overflow-hidden text-left';
+      card.style.top    = `${top}px`;
+      card.style.height = `${height}px`;
+      card.style.zIndex = '5';
+      card.innerHTML = `
+        <div class="text-xs font-semibold leading-tight truncate">🚫 ${b.motif}</div>
+        ${height >= 44 ? `<div class="text-xs leading-tight opacity-60">${b.debut} – ${b.fin}</div>` : ''}
+      `;
+      col.appendChild(card);
+    });
+  }
+
+  // Scroll vers 8h au chargement
+  const body = document.getElementById('cal-body');
+  if (body.dataset.scrolled !== '1') {
+    body.scrollTop = HOUR_PX; // 1 heure = 8h
+    body.dataset.scrolled = '1';
+  }
+}
+
+// ── Modal ───────────────────────────────────────────────
+function openModal(r) {
+  document.getElementById('modal-title').textContent = `${r.prenom} ${r.nom}`;
+
+  // Badge statut
+  const badge = document.getElementById('modal-statut-badge');
+  badge.innerHTML = r.statut === 'confirmé'
+    ? `<span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-green-50 text-green-700">✓ Confirmé</span>`
+    : `<span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-red-50 text-red-500">✕ Annulé</span>`;
+
+  // Remplir le formulaire
+  document.getElementById('m-prenom').value    = r.prenom;
+  document.getElementById('m-nom').value       = r.nom;
+  document.getElementById('m-date').value      = r.date;
+  document.getElementById('m-creneau').value   = r.creneau;
+  document.getElementById('m-email').value     = r.email;
+  document.getElementById('m-telephone').value = r.telephone;
+  document.getElementById('m-statut').value    = r.statut;
+
+  const svc = document.getElementById('m-service');
+  for (let opt of svc.options) { opt.selected = parseInt(opt.value) === r.service_id; }
+
+  // Actions
+  document.getElementById('modal-form').action        = EDIT_URL_TPL.replace('{id}', r.id);
+  document.getElementById('modal-delete-form').action = DELETE_URL_TPL.replace('{id}', r.id);
+
+  // Ouvrir
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  document.getElementById('modal').style.transform = 'translateX(0)';
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.add('hidden');
+  document.getElementById('modal').style.transform = 'translateX(100%)';
+}
+
+// ── Init ────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  renderWeek();
+});
+</script>
+{% endblock %}

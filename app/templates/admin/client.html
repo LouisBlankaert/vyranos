@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% block title %}{{ client.business.nom if client.business else client.email }} — Admin{% endblock %}
+{% block body %}
+<div class="min-h-screen bg-gray-50">
+
+  <nav class="bg-gray-900 px-6 h-14 flex items-center gap-4">
+    <a href="{{ url_for('admin.index') }}" class="text-gray-400 hover:text-white text-sm transition">← Tous les clients</a>
+    <span class="text-gray-700">|</span>
+    <span class="text-white font-medium text-sm">{{ client.business.nom if client.business else client.email }}</span>
+    <a href="{{ url_for('admin.logout') }}" class="text-gray-400 hover:text-white text-sm transition ml-auto">Déconnexion</a>
+  </nav>
+
+  <div class="max-w-5xl mx-auto px-6 py-10 space-y-8">
+
+    <!-- INFOS CLIENT -->
+    <div class="grid grid-cols-2 gap-6">
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <h2 class="font-semibold text-gray-900 mb-4">Informations</h2>
+        <dl class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Email</dt>
+            <dd class="font-medium">{{ client.email }}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Slug</dt>
+            <dd>
+              <a href="/{{ client.slug }}" target="_blank" class="text-indigo-600 hover:underline font-medium">
+                /{{ client.slug }}
+              </a>
+            </dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Inscrit le</dt>
+            <dd class="font-medium">{{ client.created_at.strftime('%d/%m/%Y à %H:%M') }}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Essai jusqu'au</dt>
+            <dd class="font-medium">{{ client.trial_ends_at.strftime('%d/%m/%Y') if client.trial_ends_at else '—' }}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Template</dt>
+            <dd class="font-medium capitalize">{{ client.business.template if client.business else '—' }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <h2 class="font-semibold text-gray-900 mb-4">Abonnement</h2>
+        <dl class="space-y-3 text-sm">
+          {% if client.subscription %}
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Statut</dt>
+            <dd>
+              <span class="text-xs px-2 py-1 rounded-lg font-medium
+                {{ 'bg-green-50 text-green-700' if client.subscription.statut == 'active' else 'bg-red-50 text-red-700' }}">
+                {{ client.subscription.statut }}
+              </span>
+            </dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">ID Stripe</dt>
+            <dd class="font-mono text-xs text-gray-500 truncate max-w-[180px]">{{ client.subscription.stripe_subscription_id or '—' }}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Fin de période</dt>
+            <dd class="font-medium">{{ client.subscription.current_period_end.strftime('%d/%m/%Y') if client.subscription.current_period_end else '—' }}</dd>
+          </div>
+          {% else %}
+          <p class="text-gray-400">Aucun abonnement Stripe.</p>
+          {% endif %}
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Stripe customer</dt>
+            <dd class="font-mono text-xs text-gray-500 truncate max-w-[180px]">{{ client.stripe_customer_id or '—' }}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="grid grid-cols-3 gap-4">
+      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm text-center">
+        <p class="text-2xl font-bold text-gray-900">{{ client.business.services|length if client.business else 0 }}</p>
+        <p class="text-xs text-gray-500 mt-1">Services</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm text-center">
+        <p class="text-2xl font-bold text-gray-900">{{ reservations|length }}</p>
+        <p class="text-xs text-gray-500 mt-1">Réservations totales</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm text-center">
+        <p class="text-2xl font-bold text-green-600">
+          {{ reservations|selectattr('statut', 'equalto', 'confirmé')|list|length }}
+        </p>
+        <p class="text-xs text-gray-500 mt-1">Confirmées</p>
+      </div>
+    </div>
+
+    <!-- RESERVATIONS DE SES CLIENTS -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h2 class="font-semibold text-gray-900">Clients du commerce</h2>
+        <p class="text-xs text-gray-400 mt-0.5">Personnes ayant réservé chez {{ client.business.nom if client.business else 'ce commerce' }}</p>
+      </div>
+      {% if reservations %}
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-gray-100">
+            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Client</th>
+            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Service</th>
+            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</th>
+            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Créneau</th>
+            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Statut</th>
+            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Réservé le</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for r in reservations %}
+          <tr class="hover:bg-gray-50 transition">
+            <td class="px-6 py-4">
+              <p class="font-medium text-gray-900">{{ r.prenom }} {{ r.nom }}</p>
+              <p class="text-xs text-gray-400">{{ r.email }}</p>
+            </td>
+            <td class="px-6 py-4 text-gray-600">{{ r.service.nom }}</td>
+            <td class="px-6 py-4 text-gray-600">{{ r.date.strftime('%d/%m/%Y') }}</td>
+            <td class="px-6 py-4 font-medium">{{ r.creneau }}</td>
+            <td class="px-6 py-4">
+              <span class="text-xs px-2 py-1 rounded-lg font-medium
+                {{ 'bg-green-50 text-green-700' if r.statut == 'confirmé' else 'bg-red-50 text-red-700' }}">
+                {{ r.statut }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-gray-400 text-xs">{{ r.created_at.strftime('%d/%m/%Y') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="p-10 text-center text-gray-400 text-sm">Aucune réservation pour l'instant.</div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

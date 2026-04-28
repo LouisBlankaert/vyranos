@@ -1,0 +1,72 @@
+{% extends 'onboarding/layout.html' %}
+{% block onboarding_content %}
+<h2 class="text-2xl font-bold mb-1">Vos services</h2>
+<p class="text-gray-500 text-sm mb-6">Étape 3 sur 5 — Définissez ce que vous proposez</p>
+
+<form method="POST">
+  <div id="services-list" class="space-y-3 mb-4">
+    {% for s in business.services if business.services %}
+    <div class="service-row flex gap-3 items-start p-3 bg-gray-50 rounded-xl">
+      <div class="flex-1 grid grid-cols-3 gap-2">
+        <input type="text" name="service_nom" value="{{ s.nom }}" placeholder="Nom du service *" required
+          class="col-span-3 md:col-span-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <select name="service_duree"
+          class="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+          {% for d in [15, 20, 30, 45, 60, 75, 90, 120] %}
+          <option value="{{ d }}" {{ 'selected' if d == s.duree_minutes }}>{{ d }} min</option>
+          {% endfor %}
+        </select>
+        <input type="number" name="service_prix" value="{{ s.prix }}" step="0.01" min="0" placeholder="Prix €"
+          class="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <input type="text" name="service_description" value="{{ s.description or '' }}" placeholder="Description (optionnel)"
+          class="col-span-3 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+      <button type="button" onclick="this.closest('.service-row').remove()"
+        class="text-red-400 hover:text-red-600 mt-2 text-lg leading-none flex-shrink-0">×</button>
+    </div>
+    {% else %}
+    <!-- empty row template is added via JS -->
+    {% endfor %}
+  </div>
+
+  <button type="button" id="add-service"
+    class="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 font-medium mb-6">
+    + Ajouter un service
+  </button>
+
+  <div class="flex justify-between">
+    <a href="{{ url_for('onboarding.step2') }}" class="text-sm text-gray-500 hover:text-gray-700 px-5 py-3 rounded-lg border border-gray-200 hover:border-gray-300 transition">
+      ← Retour
+    </a>
+    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 py-3 rounded-lg text-sm transition">
+      Suivant →
+    </button>
+  </div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script>
+const serviceRow = `
+<div class="service-row flex gap-3 items-start p-3 bg-gray-50 rounded-xl">
+  <div class="flex-1 grid grid-cols-3 gap-2">
+    <input type="text" name="service_nom" placeholder="Nom du service *" required
+      class="col-span-3 md:col-span-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+    <select name="service_duree" class="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+      <option value="15">15 min</option><option value="20">20 min</option><option value="30">30 min</option>
+      <option value="45">45 min</option><option value="60" selected>60 min</option><option value="75">75 min</option>
+      <option value="90">90 min</option><option value="120">120 min</option>
+    </select>
+    <input type="number" name="service_prix" step="0.01" min="0" placeholder="Prix €"
+      class="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+    <input type="text" name="service_description" placeholder="Description (optionnel)"
+      class="col-span-3 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+  </div>
+  <button type="button" onclick="this.closest('.service-row').remove()"
+    class="text-red-400 hover:text-red-600 mt-2 text-lg leading-none flex-shrink-0">×</button>
+</div>`;
+
+const list = document.getElementById('services-list');
+if (list.children.length === 0) list.insertAdjacentHTML('beforeend', serviceRow);
+document.getElementById('add-service').addEventListener('click', () => list.insertAdjacentHTML('beforeend', serviceRow));
+</script>
+{% endblock %}

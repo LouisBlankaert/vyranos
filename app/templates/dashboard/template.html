@@ -1,0 +1,126 @@
+{% extends 'dashboard/layout.html' %}
+{% block page_title %}Apparence{% endblock %}
+{% block content %}
+<div class="max-w-3xl">
+  <p class="text-sm text-gray-500 mb-6">Choisissez le style de votre page publique. La couleur principale se règle dans <a href="{{ url_for('dashboard.business') }}" class="text-indigo-600 hover:underline">Mon commerce</a>.</p>
+  <form method="POST">
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-5 mb-8">
+
+      <!-- Élégant -->
+      <label class="cursor-pointer group">
+        <input type="radio" name="template" value="elegant" class="sr-only peer"
+          {{ 'checked' if business.template == 'elegant' }}>
+        <div class="rounded-2xl overflow-hidden border-2 transition peer-checked:shadow-xl border-gray-200 group-hover:border-gray-300 peer-checked:border-yellow-500">
+          <div class="bg-gray-950 px-4 py-6 text-center">
+            <div class="w-10 h-10 rounded-full mx-auto mb-2" style="background:#c9a84c;"></div>
+            <p class="font-serif text-white text-sm font-bold">Élégant</p>
+            <p class="text-xs mt-0.5" style="color:#c9a84c;">Salons, spa</p>
+          </div>
+          <div class="bg-gray-900 p-3 space-y-1.5">
+            <div class="h-1.5 bg-gray-700 rounded w-3/4"></div>
+            <div class="h-1.5 bg-gray-800 rounded w-1/2"></div>
+            <div class="h-4 rounded w-1/3 mt-2" style="background:#c9a84c;"></div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mt-2 px-1">
+          <p class="text-xs font-medium text-gray-700">Élégant</p>
+          <a href="/demo/elegant" target="_blank" class="text-xs text-indigo-500 hover:underline">Voir →</a>
+        </div>
+      </label>
+
+      <!-- Moderne -->
+      <label class="cursor-pointer group">
+        <input type="radio" name="template" value="moderne" class="sr-only peer"
+          {{ 'checked' if business.template == 'moderne' }}>
+        <div class="rounded-2xl overflow-hidden border-2 transition peer-checked:shadow-xl border-gray-200 group-hover:border-gray-300 peer-checked:border-amber-800">
+          <div class="px-4 py-6 text-center" style="background:#8B4513;">
+            <div class="w-10 h-10 bg-white rounded-full mx-auto mb-2"></div>
+            <p class="font-sans text-white text-sm font-bold">Moderne</p>
+            <p class="text-white/70 text-xs mt-0.5">Restaurants, cafés</p>
+          </div>
+          <div class="p-3 space-y-1.5" style="background:#fdf6ec;">
+            <div class="h-1.5 rounded w-3/4" style="background:#e8c9a0;"></div>
+            <div class="h-1.5 rounded w-1/2" style="background:#f0dfc0;"></div>
+            <div class="h-4 rounded w-1/3 mt-2" style="background:#8B4513;"></div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mt-2 px-1">
+          <p class="text-xs font-medium text-gray-700">Moderne</p>
+          <a href="/demo/moderne" target="_blank" class="text-xs text-indigo-500 hover:underline">Voir →</a>
+        </div>
+      </label>
+
+      <!-- Minimal -->
+      <label class="cursor-pointer group">
+        <input type="radio" name="template" value="minimal" class="sr-only peer"
+          {{ 'checked' if business.template == 'minimal' }}>
+        <div class="rounded-2xl overflow-hidden border-2 transition peer-checked:shadow-xl border-gray-200 group-hover:border-gray-300 peer-checked:border-gray-900">
+          <div class="bg-white px-4 py-6 text-center border-b border-gray-100">
+            <div class="w-10 h-10 bg-gray-900 rounded-full mx-auto mb-2"></div>
+            <p class="font-sans text-gray-900 text-sm font-bold">Minimal</p>
+            <p class="text-gray-400 text-xs mt-0.5">Coachs, freelances</p>
+          </div>
+          <div class="bg-gray-50 p-3 space-y-1.5">
+            <div class="h-1.5 bg-gray-200 rounded w-3/4"></div>
+            <div class="h-1.5 bg-gray-100 rounded w-1/2"></div>
+            <div class="h-4 bg-gray-900 rounded w-1/3 mt-2"></div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mt-2 px-1">
+          <p class="text-xs font-medium text-gray-700">Minimal</p>
+          <a href="/demo/minimal" target="_blank" class="text-xs text-indigo-500 hover:underline">Voir →</a>
+        </div>
+      </label>
+
+      <!-- Nature -->
+      <label class="cursor-pointer group">
+        <input type="radio" name="template" value="nature" class="sr-only peer"
+          {{ 'checked' if business.template == 'nature' }}>
+        <div class="rounded-2xl overflow-hidden border-2 transition peer-checked:shadow-xl border-gray-200 group-hover:border-gray-300 peer-checked:border-green-700">
+          <div class="px-4 py-6 text-center" style="background:#faf7f2;">
+            <div class="w-10 h-10 rounded-full mx-auto mb-2" style="background:#5c7a4e;"></div>
+            <p class="text-sm font-semibold italic" style="color:#2c2c27; font-family: Georgia, serif;">Nature</p>
+            <p class="text-xs mt-0.5" style="color:#5c7a4e;">Naturo, yoga</p>
+          </div>
+          <div class="p-3 space-y-1.5" style="background:#f0ece4;">
+            <div class="h-1.5 rounded-full w-3/4" style="background:#c8d9bf;"></div>
+            <div class="h-1.5 rounded-full w-1/2" style="background:#dde8d6;"></div>
+            <div class="h-4 rounded-full w-1/3 mt-2" style="background:#5c7a4e;"></div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mt-2 px-1">
+          <p class="text-xs font-medium text-gray-700">Nature</p>
+          <a href="/demo/nature" target="_blank" class="text-xs text-indigo-500 hover:underline">Voir →</a>
+        </div>
+      </label>
+
+      <!-- Premium -->
+      <label class="cursor-pointer group">
+        <input type="radio" name="template" value="premium" class="sr-only peer"
+          {{ 'checked' if business.template == 'premium' }}>
+        <div class="rounded-2xl overflow-hidden border-2 transition peer-checked:shadow-xl border-gray-200 group-hover:border-gray-300 peer-checked:border-red-700">
+          <div class="bg-white px-4 py-6 text-center border-b border-gray-100">
+            <div class="w-10 h-10 rounded-full mx-auto mb-2" style="background:#c41e3a;"></div>
+            <p class="text-sm font-bold text-gray-900">Premium</p>
+            <p class="text-xs mt-0.5" style="color:#c41e3a;">Médecin, avocat</p>
+          </div>
+          <div class="bg-gray-50 p-3 space-y-1.5">
+            <div class="h-1.5 bg-gray-200 rounded w-3/4"></div>
+            <div class="h-1.5 bg-gray-100 rounded w-1/2"></div>
+            <div class="h-4 rounded w-1/3 mt-2" style="background:#c41e3a;"></div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mt-2 px-1">
+          <p class="text-xs font-medium text-gray-700">Premium</p>
+          <a href="/demo/premium" target="_blank" class="text-xs text-indigo-500 hover:underline">Voir →</a>
+        </div>
+      </label>
+
+    </div>
+
+    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-lg text-sm transition">
+      Appliquer ce template
+    </button>
+  </form>
+</div>
+{% endblock %}

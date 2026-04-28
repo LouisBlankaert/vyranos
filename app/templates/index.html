@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+{% block title %}Vyranos — Votre page pro en 5 minutes{% endblock %}
+{% block body %}
+
+<!-- NAV -->
+<nav class="fixed top-0 inset-x-0 z-40 bg-white/80 backdrop-blur border-b border-gray-100">
+  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <span class="text-xl font-bold tracking-tight">Vyr<span class="text-indigo-600">anos</span></span>
+    <div class="flex items-center gap-4">
+      <a href="/login" class="text-sm text-gray-600 hover:text-gray-900 transition">Connexion</a>
+      <a href="/signup" class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition">Commencer gratuit</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="pt-32 pb-24 px-6 bg-white">
+  <div class="max-w-4xl mx-auto text-center">
+    <div class="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
+      <span class="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
+      Essai gratuit 7 jours — aucune CB requise
+    </div>
+    <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-gray-900 leading-tight mb-6">
+      Votre commerce local,<br>
+      <span class="text-indigo-600">en ligne en 5 minutes.</span>
+    </h1>
+    <p class="text-xl text-gray-500 max-w-2xl mx-auto mb-10">
+      Créez votre page professionnelle et votre système de réservation sans coder. Idéal pour les restaurants, salons, coachs et artisans.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="/signup" class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition shadow-lg shadow-indigo-200">
+        Créer ma page gratuitement →
+      </a>
+      <a href="/demo" class="inline-flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-800 text-base font-semibold px-8 py-4 rounded-xl transition">
+        Voir une démo
+      </a>
+    </div>
+    <p class="mt-6 text-sm text-gray-400">Puis {{ prix }}€/mois — annulez quand vous voulez.</p>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="py-24 px-6 bg-gray-50">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="text-3xl font-bold text-center mb-4">Tout ce dont vous avez besoin</h2>
+    <p class="text-gray-500 text-center mb-16 max-w-xl mx-auto">Un outil simple, complet, conçu pour les commerçants — pas pour les développeurs.</p>
+    <div class="grid md:grid-cols-3 gap-8">
+      {% for feat in [
+        ('🌐', 'Page personnalisée', 'Nom, description, photos, couleurs, réseaux sociaux. Votre URL unique style vyranos.app/votre-nom.'),
+        ('📅', 'Réservations en ligne', 'Vos clients réservent directement depuis votre page. Créneaux générés automatiquement selon vos horaires.'),
+        ('💳', 'Paiement Stripe', 'Abonnement géré automatiquement. Aucune surprise, factures incluses.'),
+        ('📱', 'Design pro & mobile', 'Cinq templates élégants, 100% responsive. Vos clients vous trouvent sur mobile.'),
+        ('🕐', 'Horaires flexibles', 'Définissez vos jours et heures d\'ouverture. Les créneaux s\'adaptent automatiquement.'),
+        ('⚡', 'Mise en ligne immédiate', 'En 5 étapes guidées, votre page est en ligne. Pas de code, pas de serveur.'),
+      ] %}
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div class="text-3xl mb-4">{{ feat[0] }}</div>
+        <h3 class="font-semibold text-lg mb-2">{{ feat[1] }}</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">{{ feat[2] }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- TEMPLATES -->
+<section id="demo" class="py-24 px-6 bg-white">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="text-3xl font-bold text-center mb-4">5 templates au choix</h2>
+    <p class="text-gray-500 text-center mb-16 max-w-xl mx-auto">Cliquez sur un template pour voir la démo complète.</p>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- ÉLÉGANT -->
+      <a href="/demo/elegant" target="_blank"
+        class="group rounded-3xl overflow-hidden border-2 border-gray-900 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all block">
+        <div class="bg-gray-950 px-6 py-8 text-center">
+          <div class="w-12 h-12 rounded-full mx-auto mb-3" style="background:#c9a84c;"></div>
+          <h3 class="font-serif text-white text-xl font-bold">Élégant</h3>
+          <p class="text-xs mt-1" style="color:#c9a84c;">Salons de beauté, spa</p>
+        </div>
+        <div class="bg-gray-900 px-6 py-4 space-y-2">
+          <div class="h-2 bg-gray-700 rounded w-3/4"></div>
+          <div class="h-2 bg-gray-800 rounded w-1/2"></div>
+          <div class="h-6 rounded w-28 mt-3" style="background:#c9a84c;"></div>
+        </div>
+        <div class="bg-gray-900 px-6 pb-5">
+          <p class="text-xs font-medium group-hover:underline" style="color:#c9a84c;">Voir la démo →</p>
+        </div>
+      </a>
+
+      <!-- MODERNE -->
+      <a href="/demo/moderne" target="_blank"
+        class="group rounded-3xl overflow-hidden border-2 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all block" style="border-color:#8B4513;">
+        <div class="px-6 py-8 text-center" style="background:#8B4513;">
+          <div class="w-12 h-12 bg-white rounded-full mx-auto mb-3"></div>
+          <h3 class="font-sans text-white text-xl font-bold">Moderne</h3>
+          <p class="text-white/70 text-xs mt-1">Restaurants, cafés</p>
+        </div>
+        <div class="px-6 py-4 space-y-2" style="background:#fdf6ec;">
+          <div class="h-2 rounded w-3/4" style="background:#e8c9a0;"></div>
+          <div class="h-2 rounded w-1/2" style="background:#f0dfc0;"></div>
+          <div class="h-6 rounded w-28 mt-3" style="background:#8B4513;"></div>
+        </div>
+        <div class="px-6 pb-5" style="background:#fdf6ec;">
+          <p class="text-xs font-medium group-hover:underline" style="color:#8B4513;">Voir la démo →</p>
+        </div>
+      </a>
+
+      <!-- MINIMAL -->
+      <a href="/demo/minimal" target="_blank"
+        class="group rounded-3xl overflow-hidden border-2 border-gray-200 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all block">
+        <div class="bg-white px-6 py-8 text-center border-b border-gray-100">
+          <div class="w-12 h-12 bg-gray-900 rounded-full mx-auto mb-3"></div>
+          <h3 class="font-sans text-gray-900 text-xl font-bold">Minimal</h3>
+          <p class="text-gray-400 text-xs mt-1">Coachs, freelances</p>
+        </div>
+        <div class="bg-gray-50 px-6 py-4 space-y-2">
+          <div class="h-2 bg-gray-200 rounded w-3/4"></div>
+          <div class="h-2 bg-gray-100 rounded w-1/2"></div>
+          <div class="h-6 bg-gray-900 rounded w-28 mt-3"></div>
+        </div>
+        <div class="bg-gray-50 px-6 pb-5">
+          <p class="text-xs font-medium text-gray-700 group-hover:underline">Voir la démo →</p>
+        </div>
+      </a>
+
+      <!-- NATURE -->
+      <a href="/demo/nature" target="_blank"
+        class="group rounded-3xl overflow-hidden border-2 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all block" style="border-color:#5c7a4e;">
+        <div class="px-6 py-8 text-center" style="background:#faf7f2;">
+          <div class="w-12 h-12 rounded-full mx-auto mb-3" style="background:#5c7a4e;"></div>
+          <h3 class="text-xl font-semibold italic" style="color:#2c2c27; font-family: Georgia, serif;">Nature</h3>
+          <p class="text-xs mt-1" style="color:#5c7a4e;">Naturopathe, yoga, bien-être</p>
+        </div>
+        <div class="px-6 py-4 space-y-2" style="background:#f0ece4;">
+          <div class="h-2 rounded-full w-3/4" style="background:#c8d9bf;"></div>
+          <div class="h-2 rounded-full w-1/2" style="background:#dde8d6;"></div>
+          <div class="h-6 rounded-full w-28 mt-3" style="background:#5c7a4e;"></div>
+        </div>
+        <div class="px-6 pb-5" style="background:#f0ece4;">
+          <p class="text-xs font-medium group-hover:underline" style="color:#5c7a4e;">Voir la démo →</p>
+        </div>
+      </a>
+
+      <!-- PREMIUM -->
+      <a href="/demo/premium" target="_blank"
+        class="group rounded-3xl overflow-hidden border-2 border-gray-200 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all block">
+        <div class="bg-white px-6 py-8 text-center border-b border-gray-100">
+          <div class="w-12 h-12 rounded-full mx-auto mb-3" style="background:#c41e3a;"></div>
+          <h3 class="text-xl font-bold text-gray-900">Premium</h3>
+          <p class="text-xs mt-1" style="color:#c41e3a;">Médecin, avocat, consultant</p>
+        </div>
+        <div class="bg-gray-50 px-6 py-4 space-y-2">
+          <div class="h-2 bg-gray-200 rounded w-3/4"></div>
+          <div class="h-2 bg-gray-100 rounded w-1/2"></div>
+          <div class="h-6 rounded w-28 mt-3" style="background:#c41e3a;"></div>
+        </div>
+        <div class="bg-gray-50 px-6 pb-5">
+          <p class="text-xs font-medium group-hover:underline" style="color:#c41e3a;">Voir la démo →</p>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="py-24 px-6 bg-gray-50">
+  <div class="max-w-lg mx-auto text-center">
+    <h2 class="text-3xl font-bold mb-4">Un prix simple</h2>
+    <p class="text-gray-500 mb-12">Tout inclus, aucune surprise.</p>
+    <div class="bg-white rounded-3xl shadow-xl border border-gray-100 p-10">
+      {% if promo_active %}
+      <!-- PROMO BADGE -->
+      <div class="inline-flex items-center gap-2 bg-red-50 text-red-600 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
+        <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
+        Offre limitée — jusqu'au 30 mai 2026
+      </div>
+      <div class="flex items-end gap-3 mb-1">
+        <div class="text-5xl font-bold">29€<span class="text-xl text-gray-400 font-normal">/mois</span></div>
+        <div class="text-lg text-gray-300 line-through mb-1">69€</div>
+      </div>
+      <p class="text-gray-400 text-sm mb-8">Essai gratuit 7 jours · Puis 69€/mois après le 30 mai</p>
+      {% else %}
+      <div class="text-5xl font-bold mb-1">69€<span class="text-xl text-gray-400 font-normal">/mois</span></div>
+      <p class="text-gray-400 text-sm mb-8">Essai gratuit 7 jours · Sans engagement</p>
+      {% endif %}
+      <ul class="text-left space-y-3 mb-10">
+        {% for item in ['Page landing personnalisée', 'Système de réservation', 'URL unique publique', 'Tableau de bord commerçant', 'Gestion des horaires et services', '5 templates au choix', 'Agenda dynamique avec créneaux', 'Support inclus'] %}
+        <li class="flex items-center gap-3 text-sm">
+          <span class="text-green-500 text-base">✓</span>
+          <span>{{ item }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      <a href="/signup" class="block w-full bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold py-4 rounded-xl transition text-center">
+        Commencer l'essai gratuit
+      </a>
+      <p class="text-center text-xs text-gray-400 mt-4">Sans carte bancaire · Annulez quand vous voulez</p>
+    </div>
+  </div>
+</section>
+
+<!-- SUR MESURE -->
+<section class="py-24 px-6 bg-white">
+  <div class="max-w-5xl mx-auto">
+    <div class="bg-gray-900 rounded-3xl overflow-hidden">
+      <div class="grid md:grid-cols-2 gap-0">
+
+        <!-- TEXTE -->
+        <div class="p-10 md:p-14 flex flex-col justify-center">
+          <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-indigo-400 mb-6">
+            <span class="w-4 h-px bg-indigo-400"></span> Sur mesure
+          </span>
+          <h2 class="text-3xl md:text-4xl font-bold text-white leading-tight mb-4">
+            Vous voulez quelque chose d'unique ?
+          </h2>
+          <p class="text-gray-400 leading-relaxed mb-8">
+            Je conçois votre site de A à Z selon vos besoins exacts — design personnalisé, fonctionnalités spécifiques, identité visuelle soignée. Un seul interlocuteur, un résultat sur mesure.
+          </p>
+          <ul class="space-y-3 mb-10">
+            {% for item in [
+              'Design entièrement personnalisé',
+              'Intégration de votre charte graphique',
+              'Fonctionnalités spécifiques à votre activité',
+              'Livraison en 7 à 14 jours',
+              'Révisions incluses',
+            ] %}
+            <li class="flex items-center gap-3 text-sm text-gray-300">
+              <span class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-xs" style="background:rgba(99,102,241,0.2); color:#818cf8;">✓</span>
+              {{ item }}
+            </li>
+            {% endfor %}
+          </ul>
+          <div class="flex flex-wrap gap-3">
+            <a href="mailto:blankaertlouis@outlook.com?subject=Demande site sur mesure"
+              class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 py-4 rounded-xl transition text-sm">
+              Demander un devis →
+            </a>
+            <a href="https://louisblankaert.com" target="_blank"
+              class="inline-flex items-center gap-2 border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white font-semibold px-8 py-4 rounded-xl transition text-sm">
+              Voir mon portfolio ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- PRIX -->
+        <div class="bg-indigo-600 p-10 md:p-14 flex flex-col justify-center items-center text-center">
+          <p class="text-indigo-200 text-sm font-medium uppercase tracking-widest mb-4">Tarif unique</p>
+          <div class="text-7xl font-black text-white mb-2">799€</div>
+          <p class="text-indigo-200 text-sm mb-8">Paiement en une fois · Sans abonnement</p>
+          <div class="w-full bg-indigo-500/40 rounded-2xl p-6">
+            <p class="text-indigo-100 text-sm leading-relaxed">
+              Idéal pour les commerces qui ont une identité forte et veulent une page qui leur ressemble vraiment.
+            </p>
+          </div>
+          <p class="text-indigo-300 text-xs mt-6">
+            Vous pouvez aussi opter pour le plan 30€/mois et gérer vous-même.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="py-10 px-6 bg-white border-t border-gray-100 text-center">
+  <span class="text-sm text-gray-400">© 2026 Vyranos. Conçu pour les commerces locaux.</span>
+</footer>
+
+{% endblock %}

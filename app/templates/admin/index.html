@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}Admin — Vyranos{% endblock %}
+{% block body %}
+<div class="min-h-screen bg-gray-50">
+
+  <nav class="bg-gray-900 px-6 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span class="text-white font-bold">Local<span class="text-indigo-400">Site</span></span>
+      <span class="text-xs bg-indigo-600 text-white px-2 py-0.5 rounded font-medium">Admin</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="{{ url_for('admin.logout') }}" class="text-gray-400 hover:text-white text-sm transition">Déconnexion</a>
+    </div>
+  </nav>
+
+  <div class="max-w-6xl mx-auto px-6 py-10">
+
+    <!-- STATS -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+      <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <p class="text-sm text-gray-500 mb-1">Clients inscrits</p>
+        <p class="text-4xl font-bold text-gray-900">{{ users|length }}</p>
+      </div>
+      <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <p class="text-sm text-gray-500 mb-1">Abonnements actifs</p>
+        <p class="text-4xl font-bold text-green-600">
+          {{ users|selectattr('subscription')|selectattr('subscription.statut', 'equalto', 'active')|list|length }}
+        </p>
+      </div>
+      <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <p class="text-sm text-gray-500 mb-1">Réservations totales</p>
+        <p class="text-4xl font-bold text-indigo-600">{{ total_reservations }}</p>
+      </div>
+    </div>
+
+    <!-- TABLE CLIENTS -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h2 class="font-semibold text-gray-900">Tous les clients</h2>
+      </div>
+      {% if users %}
+      <div class="overflow-x-auto">
+    <table class="w-full text-sm min-w-[700px]">
+        <thead>
+          <tr class="border-b border-gray-100">
+            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Commerce</th>
+            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Email</th>
+            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Slug</th>
+            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Inscrit le</th>
+            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Statut</th>
+            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Réservations</th>
+            <th class="px-6 py-3"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for u in users %}
+          <tr class="hover:bg-gray-50 transition">
+            <td class="px-6 py-4 font-medium text-gray-900">
+              {{ u.business.nom if u.business else '—' }}
+            </td>
+            <td class="px-6 py-4 text-gray-500">{{ u.email }}</td>
+            <td class="px-6 py-4">
+              <a href="/{{ u.slug }}" target="_blank" class="text-indigo-600 hover:underline">{{ u.slug }}</a>
+            </td>
+            <td class="px-6 py-4 text-gray-500">{{ u.created_at.strftime('%d/%m/%Y') }}</td>
+            <td class="px-6 py-4">
+              {% if u.subscription and u.subscription.statut == 'active' %}
+                <span class="text-xs bg-green-50 text-green-700 px-2 py-1 rounded-lg font-medium">Actif</span>
+              {% elif u.trial_ends_at %}
+                <span class="text-xs bg-amber-50 text-amber-700 px-2 py-1 rounded-lg font-medium">Essai</span>
+              {% else %}
+                <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-lg font-medium">Inactif</span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-4 text-gray-500">
+              {{ u.business.reservations|length if u.business else 0 }}
+            </td>
+            <td class="px-6 py-4">
+              <a href="{{ url_for('admin.client', user_id=u.id) }}"
+                class="text-xs text-indigo-600 hover:underline font-medium">Détails →</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="p-12 text-center text-gray-400 text-sm">Aucun client pour l'instant.</div>
+      {% endif %}
+    </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

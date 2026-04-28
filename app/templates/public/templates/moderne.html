@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ business.nom }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root { --primary: {{ business.couleur_primaire }}; }
+    body { font-family: 'Inter', sans-serif; background: #fdf6ec; }
+    .text-primary { color: var(--primary); }
+    .bg-primary { background-color: var(--primary); }
+  </style>
+</head>
+<body class="antialiased">
+
+{% if is_demo is defined and is_demo %}
+<div class="text-white text-center py-2.5 px-4 text-sm font-medium bg-primary">
+  Ceci est une démo Vyranos — <a href="/signup" class="underline font-semibold">Créez votre page gratuitement →</a>
+</div>
+{% endif %}
+
+<!-- HERO -->
+<section class="relative overflow-hidden" style="background:var(--primary);">
+  {% if business.cover_url %}
+  <img src="{{ business.cover_url }}" class="absolute inset-0 w-full h-full object-cover object-center opacity-25">
+  {% endif %}
+
+  <!-- NAV -->
+  <nav class="relative z-10 flex items-center justify-between px-6 md:px-12 py-6">
+    <div class="flex items-center gap-3">
+      {% if business.logo_url %}
+      <img src="{{ business.logo_url }}" class="w-10 h-10 rounded-xl object-cover bg-white/20">
+      {% endif %}
+      <span class="font-bold text-white text-lg">{{ business.nom }}</span>
+    </div>
+    <div class="hidden md:flex items-center gap-8 text-white/70 text-sm font-medium">
+      <a href="#services" class="hover:text-white transition">Services</a>
+      <a href="#horaires" class="hover:text-white transition">Horaires</a>
+      <a href="#contact" class="hover:text-white transition">Contact</a>
+    </div>
+    <a href="{{ '/signup' if (is_demo is defined and is_demo) else '/' + user.slug + '/booking' }}"
+      class="bg-white font-bold text-sm px-6 py-2.5 rounded-xl transition hover:bg-white/90"
+      style="color:var(--primary);">
+      {{ 'Créer ma page' if (is_demo is defined and is_demo) else 'Réserver' }}
+    </a>
+  </nav>
+
+  <!-- HERO CONTENT -->
+  <div class="relative z-10 px-6 md:px-12 pt-16 pb-32">
+    <div class="max-w-3xl">
+      {% if business.ville %}
+      <div class="inline-flex items-center gap-2 bg-white/10 text-white/80 text-xs font-medium px-3 py-1.5 rounded-full mb-6">
+        <span class="w-1.5 h-1.5 bg-white rounded-full"></span>
+        {{ business.ville }}
+      </div>
+      {% endif %}
+      <h1 class="text-5xl md:text-7xl font-black text-white leading-none mb-6">{{ business.nom }}</h1>
+      {% if business.description %}
+      <p class="text-white/70 text-lg md:text-xl max-w-xl leading-relaxed mb-10">{{ business.description }}</p>
+      {% endif %}
+      <a href="{{ '/signup' if (is_demo is defined and is_demo) else '/' + user.slug + '/booking' }}"
+        class="inline-flex items-center gap-3 bg-white font-bold px-8 py-4 rounded-2xl text-base transition hover:bg-white/90 shadow-xl"
+        style="color:var(--primary);">
+        {{ 'Créer ma page' if (is_demo is defined and is_demo) else 'Prendre rendez-vous' }}
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- WAVE -->
+  <div class="absolute bottom-0 left-0 right-0">
+    <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0 80L1440 80L1440 20C1200 80 900 0 720 20C540 40 240 0 0 20L0 80Z" fill="#fdf6ec"/>
+    </svg>
+  </div>
+</section>
+
+<main class="max-w-6xl mx-auto px-6 md:px-12">
+
+  <!-- SERVICES -->
+  {% if services %}
+  <section id="services" class="py-20">
+    <div class="flex items-end justify-between mb-12">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-widest text-primary mb-2">Ce qu'on propose</p>
+        <h2 class="text-3xl font-black text-gray-900">Nos services</h2>
+      </div>
+      <a href="{{ '/signup' if (is_demo is defined and is_demo) else '/' + user.slug + '/booking' }}"
+        class="hidden md:inline-flex items-center gap-2 text-sm font-semibold text-white px-6 py-3 rounded-xl bg-primary hover:opacity-90 transition">
+        Réserver →
+      </a>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {% for s in services %}
+      <div class="group bg-white hover:bg-amber-50 rounded-2xl p-6 border border-amber-100 hover:border-amber-200 hover:shadow-lg transition-all">
+        <div class="flex items-start justify-between mb-4">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold bg-primary">
+            {{ loop.index }}
+          </div>
+          <span class="text-2xl font-black text-primary">{{ '%.0f'|format(s.prix) }}€</span>
+        </div>
+        <h3 class="font-bold text-gray-900 text-lg mb-1">{{ s.nom }}</h3>
+        {% if s.description %}
+        <p class="text-gray-500 text-sm leading-relaxed mb-4">{{ s.description }}</p>
+        {% endif %}
+        <p class="text-xs text-gray-400 font-medium">⏱ {{ s.duree_minutes }} min</p>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="mt-10 text-center md:hidden">
+      <a href="{{ '/signup' if (is_demo is defined and is_demo) else '/' + user.slug + '/booking' }}"
+        class="inline-flex items-center gap-2 text-sm font-bold text-white px-8 py-4 rounded-2xl bg-primary hover:opacity-90 transition">
+        Prendre rendez-vous →
+      </a>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- HORAIRES -->
+  {% if business.horaires %}
+  <section id="horaires" class="py-20 border-t border-gray-100">
+    <div class="mb-12">
+      <p class="text-xs font-semibold uppercase tracking-widest text-primary mb-2">Quand nous trouver</p>
+      <h2 class="text-3xl font-black text-gray-900">Horaires</h2>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
+      {% for jour, h in business.horaires.items() %}
+      <div class="rounded-2xl p-4 text-center {{ 'bg-gray-50 border border-amber-100' if not h.get('ouvert') else 'border-2 border-primary/20' }}"
+        style="{{ 'background: color-mix(in srgb, var(--primary) 5%, white);' if h.get('ouvert') else '' }}">
+        <p class="text-xs font-semibold uppercase text-gray-400 mb-2 capitalize">{{ jour[:3] }}</p>
+        {% if h.get('ouvert') %}
+        <p class="text-sm font-bold text-gray-900">{{ h.debut }}</p>
+        <p class="text-xs text-gray-400 my-0.5">—</p>
+        <p class="text-sm font-bold text-gray-900">{{ h.fin }}</p>
+        {% else %}
+        <p class="text-xs text-gray-300 mt-2">Fermé</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- CONTACT -->
+  <section id="contact" class="py-20 border-t border-gray-100">
+    <div class="mb-12">
+      <p class="text-xs font-semibold uppercase tracking-widest text-primary mb-2">Nous contacter</p>
+      <h2 class="text-3xl font-black text-gray-900">Contact</h2>
+    </div>
+    <div class="flex flex-wrap gap-4">
+      {% if business.adresse %}
+      <div class="flex items-center gap-3 bg-white rounded-2xl px-5 py-4 text-sm text-gray-700 border border-amber-100">
+        <span class="text-lg">📍</span>
+        <span>{{ business.adresse }}{% if business.ville %}, {{ business.ville }}{% endif %}</span>
+      </div>
+      {% endif %}
+      {% if business.telephone %}
+      <a href="tel:{{ business.telephone }}" class="flex items-center gap-3 bg-white hover:bg-amber-50 rounded-2xl px-5 py-4 text-sm text-gray-700 border border-amber-100 transition">
+        <span class="text-lg">📞</span> {{ business.telephone }}
+      </a>
+      {% endif %}
+      {% if business.email_contact %}
+      <a href="mailto:{{ business.email_contact }}" class="flex items-center gap-3 bg-white hover:bg-amber-50 rounded-2xl px-5 py-4 text-sm text-gray-700 border border-amber-100 transition">
+        <span class="text-lg">✉</span> {{ business.email_contact }}
+      </a>
+      {% endif %}
+      {% if business.instagram %}
+      <a href="https://instagram.com/{{ business.instagram|replace('@','') }}" target="_blank"
+        class="flex items-center gap-3 bg-white hover:bg-amber-50 rounded-2xl px-5 py-4 text-sm text-gray-700 border border-amber-100 transition">
+        <span class="text-lg">📸</span> {{ business.instagram }}
+      </a>
+      {% endif %}
+    </div>
+  </section>
+
+</main>
+
+<footer class="border-t border-gray-100 py-8 px-12 flex items-center justify-between">
+  <span class="font-bold text-gray-900">{{ business.nom }}</span>
+  <p class="text-xs text-gray-400">Propulsé par <a href="/" class="text-primary hover:underline">Vyranos</a></p>
+</footer>
+
+</body>
+</html>

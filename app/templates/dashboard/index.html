@@ -1,0 +1,68 @@
+{% extends 'dashboard/layout.html' %}
+{% block page_title %}Vue d'ensemble{% endblock %}
+{% block content %}
+
+{% if business %}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+    <p class="text-sm text-gray-500 mb-1">Mon URL publique</p>
+    <a href="/{{ current_user.slug }}" target="_blank"
+      class="text-indigo-600 font-medium text-sm hover:underline break-all">
+      vyranos.app/{{ current_user.slug }}
+    </a>
+  </div>
+  <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+    <p class="text-sm text-gray-500 mb-1">Réservations à venir</p>
+    <p class="text-3xl font-bold text-gray-900">{{ upcoming|length }}</p>
+  </div>
+  <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+    <p class="text-sm text-gray-500 mb-1">Template actif</p>
+    <p class="text-sm font-medium text-gray-900 capitalize">{{ business.template }}</p>
+  </div>
+</div>
+
+{% if upcoming %}
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+  <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+    <h2 class="font-semibold">Prochaines réservations</h2>
+    <a href="{{ url_for('dashboard.reservations') }}" class="text-sm text-indigo-600 hover:underline">Tout voir</a>
+  </div>
+  <div class="divide-y divide-gray-50">
+    {% for r in upcoming %}
+    <div class="px-6 py-4 flex items-center gap-4">
+      <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 font-bold text-sm flex-shrink-0">
+        {{ r.date.strftime('%d') }}
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="font-medium text-sm text-gray-900">{{ r.prenom }} {{ r.nom }}</p>
+        <p class="text-xs text-gray-500">{{ r.service.nom }} · {{ r.date.strftime('%d/%m/%Y') }} à {{ r.creneau }}</p>
+      </div>
+      <span class="text-xs bg-green-50 text-green-700 px-2 py-1 rounded-lg font-medium">{{ r.statut }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% else %}
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
+  <p class="text-4xl mb-4">📅</p>
+  <p class="font-semibold text-gray-900 mb-2">Aucune réservation à venir</p>
+  <p class="text-sm text-gray-500 mb-6">Partagez votre URL publique pour recevoir vos premières réservations.</p>
+  <a href="/{{ current_user.slug }}" target="_blank"
+    class="inline-flex items-center gap-2 text-sm text-indigo-600 hover:underline font-medium">
+    Voir ma page →
+  </a>
+</div>
+{% endif %}
+
+{% else %}
+<div class="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+  <p class="font-medium text-amber-800 mb-2">Finalisez votre configuration</p>
+  <p class="text-sm text-amber-700 mb-4">Complétez l'onboarding pour mettre votre page en ligne.</p>
+  <a href="{{ url_for('onboarding.step1') }}"
+    class="inline-flex items-center text-sm font-medium text-amber-800 hover:underline">
+    Continuer →
+  </a>
+</div>
+{% endif %}
+
+{% endblock %}

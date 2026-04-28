@@ -1,0 +1,67 @@
+{% extends 'dashboard/layout.html' %}
+{% block page_title %}Horaires{% endblock %}
+{% block content %}
+<div class="max-w-2xl">
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+    <form method="POST" class="space-y-3">
+      {% set heures = ['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00'] %}
+      {% for jour in jours %}
+        {% set h = business.horaires.get(jour, {}) if business.horaires else {} %}
+        <div class="flex items-center gap-4 py-3 border-b border-gray-50 last:border-0">
+          <div class="w-24">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="{{ jour }}_ouvert"
+                {% if h.get('ouvert', False) %}checked{% endif %}
+                class="rounded text-indigo-600 focus:ring-indigo-500"
+                onchange="toggleJour('{{ jour }}', this.checked)">
+              <span class="text-sm font-medium capitalize">{{ jour }}</span>
+            </label>
+          </div>
+          <div id="{{ jour }}_times" class="flex items-center gap-3 {{ 'opacity-30 pointer-events-none' if not h.get('ouvert', False) }}">
+            <select name="{{ jour }}_debut"
+              class="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+              {% for heure in heures %}
+              <option value="{{ heure }}" {{ 'selected' if heure == h.get('debut', '09:00') }}>{{ heure }}</option>
+              {% endfor %}
+            </select>
+            <span class="text-gray-400 text-sm">→</span>
+            <select name="{{ jour }}_fin"
+              class="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+              {% for heure in heures %}
+              <option value="{{ heure }}" {{ 'selected' if heure == h.get('fin', '18:00') }}>{{ heure }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      {% endfor %}
+
+      <!-- STEP CRÉNEAUX -->
+      <div class="pt-6 border-t border-gray-100 mt-2">
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Intervalle entre les créneaux</label>
+        <p class="text-xs text-gray-400 mb-3">Définit le pas d'affichage des créneaux (indépendant de la durée des services).</p>
+        <select name="creneau_step"
+          class="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+          {% for val, label in [(15, '15 minutes'), (30, '30 minutes'), (45, '45 minutes'), (60, '1 heure'), (90, '1h30')] %}
+          <option value="{{ val }}" {{ 'selected' if (business.creneau_step or 30) == val }}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="pt-4">
+        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-lg text-sm transition">
+          Enregistrer
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function toggleJour(jour, checked) {
+  const el = document.getElementById(jour + '_times');
+  el.classList.toggle('opacity-30', !checked);
+  el.classList.toggle('pointer-events-none', !checked);
+}
+</script>
+{% endblock %}

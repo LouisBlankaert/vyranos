@@ -1,0 +1,56 @@
+{% extends 'onboarding/layout.html' %}
+{% block onboarding_content %}
+<h2 class="text-2xl font-bold mb-1">Vos horaires</h2>
+<p class="text-gray-500 text-sm mb-6">Étape 4 sur 5 — Définissez vos disponibilités</p>
+
+<form method="POST" class="space-y-2">
+  {% set heures = ['07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00'] %}
+  {% for jour in jours %}
+    {% set h = business.horaires.get(jour, {}) if business.horaires else {} %}
+    <div class="flex items-center gap-4 py-3 border-b border-gray-50 last:border-0">
+      <div class="w-24">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" name="{{ jour }}_ouvert" id="chk_{{ jour }}"
+            {% if h.get('ouvert', jour not in ['dimanche']) %}checked{% endif %}
+            class="rounded text-indigo-600 focus:ring-indigo-500"
+            onchange="toggleJour('{{ jour }}', this.checked)">
+          <span class="text-sm font-medium capitalize">{{ jour }}</span>
+        </label>
+      </div>
+      <div id="{{ jour }}_times" class="flex items-center gap-2 {{ 'opacity-30 pointer-events-none' if not h.get('ouvert', jour not in ['dimanche']) }}">
+        <select name="{{ jour }}_debut"
+          class="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+          {% for heure in heures %}
+          <option value="{{ heure }}" {{ 'selected' if heure == h.get('debut', '09:00') }}>{{ heure }}</option>
+          {% endfor %}
+        </select>
+        <span class="text-gray-400 text-sm">→</span>
+        <select name="{{ jour }}_fin"
+          class="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+          {% for heure in heures %}
+          <option value="{{ heure }}" {{ 'selected' if heure == h.get('fin', '18:00') }}>{{ heure }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  {% endfor %}
+
+  <div class="flex justify-between pt-4">
+    <a href="{{ url_for('onboarding.step3') }}" class="text-sm text-gray-500 hover:text-gray-700 px-5 py-3 rounded-lg border border-gray-200 hover:border-gray-300 transition">
+      ← Retour
+    </a>
+    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 py-3 rounded-lg text-sm transition">
+      Suivant →
+    </button>
+  </div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script>
+function toggleJour(jour, checked) {
+  const el = document.getElementById(jour + '_times');
+  el.classList.toggle('opacity-30', !checked);
+  el.classList.toggle('pointer-events-none', !checked);
+}
+</script>
+{% endblock %}

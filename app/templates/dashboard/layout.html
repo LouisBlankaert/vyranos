@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="flex h-screen overflow-hidden bg-gray-50">
+
+  <!-- OVERLAY MOBILE -->
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/40 z-20 hidden md:hidden" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar"
+    class="fixed md:static inset-y-0 left-0 z-30 w-64 flex-shrink-0 bg-white border-r border-gray-100 flex flex-col
+           -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out">
+    <div class="h-16 flex items-center px-6 border-b border-gray-100">
+      <a href="/" class="text-lg font-bold">Local<span class="text-indigo-600">Site</span></a>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      {% set nav = [
+        ('dashboard.index', 'Vue d\'ensemble', '⌂'),
+        ('dashboard.business', 'Mon commerce', '🏪'),
+        ('dashboard.services', 'Services', '✦'),
+        ('dashboard.horaires', 'Horaires', '🕐'),
+        ('dashboard.reservations', 'Réservations', '📅'),
+        ('dashboard.template', 'Apparence', '🎨'),
+      ] %}
+      {% for endpoint, label, icon in nav %}
+        {% set active = request.endpoint == endpoint %}
+        <a href="{{ url_for(endpoint) }}" onclick="closeSidebar()"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
+            {{ 'bg-indigo-50 text-indigo-700' if active else 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+          <span class="text-base">{{ icon }}</span>
+          {{ label }}
+        </a>
+      {% endfor %}
+    </nav>
+    <div class="p-3 border-t border-gray-100 space-y-1">
+      {% if current_user.business %}
+      <a href="{{ url_for('public.landing', slug=current_user.slug) }}" target="_blank"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition">
+        <span>↗</span> Voir ma page
+      </a>
+      {% endif %}
+      <a href="{{ url_for('billing.index') }}"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition">
+        <span>💳</span> Abonnement
+      </a>
+      <a href="{{ url_for('auth.logout') }}"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition">
+        <span>←</span> Déconnexion
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 overflow-y-auto min-w-0">
+
+    <!-- TOPBAR -->
+    <div class="h-16 flex items-center px-4 md:px-8 bg-white border-b border-gray-100 gap-3">
+      <!-- HAMBURGER -->
+      <button onclick="openSidebar()" class="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition flex-shrink-0">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+      <h1 class="font-semibold text-gray-900 truncate">{% block page_title %}Dashboard{% endblock %}</h1>
+      <div class="ml-auto flex items-center gap-2 flex-shrink-0">
+        {% if not current_user.is_subscribed() %}
+        <a href="{{ url_for('billing.checkout') }}"
+          class="text-xs bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg font-medium transition">
+          Activer
+        </a>
+        {% else %}
+        <span class="text-xs text-green-600 bg-green-50 px-2 py-1.5 rounded-lg font-medium">Actif</span>
+        {% endif %}
+        <span class="hidden sm:block text-sm text-gray-400 truncate max-w-[180px]">{{ current_user.email }}</span>
+      </div>
+    </div>
+
+    <div class="p-4 md:p-8">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+</div>
+
+<script>
+function openSidebar() {
+  document.getElementById('sidebar').classList.remove('-translate-x-full');
+  document.getElementById('sidebar-overlay').classList.remove('hidden');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.add('-translate-x-full');
+  document.getElementById('sidebar-overlay').classList.add('hidden');
+}
+</script>
+{% endblock %}

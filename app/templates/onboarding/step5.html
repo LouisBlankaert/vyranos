@@ -4,18 +4,18 @@
 <p class="text-gray-500 text-sm mb-6">Étape 5 sur 5 — Votre template de page</p>
 
 <form method="POST">
-  <div class="grid grid-cols-3 gap-4 mb-8">
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
     <label class="cursor-pointer group">
       <input type="radio" name="template" value="elegant" class="sr-only peer" checked>
       <div class="rounded-2xl overflow-hidden border-2 transition peer-checked:border-yellow-500 peer-checked:shadow-lg border-gray-200 group-hover:border-gray-300">
-        <div class="bg-gray-900 px-4 py-6 text-center">
-          <div class="w-8 h-8 bg-yellow-500 rounded-full mx-auto mb-2"></div>
+        <div class="bg-gray-950 px-4 py-6 text-center">
+          <div class="w-8 h-8 rounded-full mx-auto mb-2" style="background:#c9a84c;"></div>
           <p class="font-serif text-white text-xs font-bold">Élégant</p>
         </div>
-        <div class="bg-gray-800 p-3 space-y-1">
-          <div class="h-1 bg-gray-600 rounded w-3/4"></div>
-          <div class="h-1 bg-gray-700 rounded w-1/2"></div>
-          <div class="h-3 bg-yellow-600 rounded w-1/3 mt-1"></div>
+        <div class="bg-gray-900 p-3 space-y-1">
+          <div class="h-1 bg-gray-700 rounded w-3/4"></div>
+          <div class="h-1 bg-gray-800 rounded w-1/2"></div>
+          <div class="h-3 rounded w-1/3 mt-1" style="background:#c9a84c;"></div>
         </div>
       </div>
       <p class="text-center text-xs font-medium text-gray-600 mt-2">Élégant</p>
@@ -24,15 +24,15 @@
 
     <label class="cursor-pointer group">
       <input type="radio" name="template" value="moderne" class="sr-only peer">
-      <div class="rounded-2xl overflow-hidden border-2 transition peer-checked:border-indigo-500 peer-checked:shadow-lg border-gray-200 group-hover:border-gray-300">
-        <div class="bg-indigo-600 px-4 py-6 text-center">
+      <div class="rounded-2xl overflow-hidden border-2 transition peer-checked:border-amber-800 peer-checked:shadow-lg border-gray-200 group-hover:border-gray-300">
+        <div class="px-4 py-6 text-center" style="background:#8B4513;">
           <div class="w-8 h-8 bg-white rounded-full mx-auto mb-2"></div>
           <p class="font-sans text-white text-xs font-bold">Moderne</p>
         </div>
-        <div class="bg-indigo-50 p-3 space-y-1">
-          <div class="h-1 bg-indigo-200 rounded w-3/4"></div>
-          <div class="h-1 bg-indigo-100 rounded w-1/2"></div>
-          <div class="h-3 bg-indigo-500 rounded w-1/3 mt-1"></div>
+        <div class="p-3 space-y-1" style="background:#fdf6ec;">
+          <div class="h-1 rounded w-3/4" style="background:#e8c9a0;"></div>
+          <div class="h-1 rounded w-1/2" style="background:#f0dfc0;"></div>
+          <div class="h-3 rounded w-1/3 mt-1" style="background:#8B4513;"></div>
         </div>
       </div>
       <p class="text-center text-xs font-medium text-gray-600 mt-2">Moderne</p>
@@ -54,6 +54,40 @@
       </div>
       <p class="text-center text-xs font-medium text-gray-600 mt-2">Minimal</p>
       <p class="text-center text-xs text-gray-400">Coachs, freelances</p>
+    </label>
+
+    <label class="cursor-pointer group">
+      <input type="radio" name="template" value="nature" class="sr-only peer">
+      <div class="rounded-2xl overflow-hidden border-2 transition peer-checked:border-green-700 peer-checked:shadow-lg border-gray-200 group-hover:border-gray-300">
+        <div class="px-4 py-6 text-center" style="background:#faf7f2;">
+          <div class="w-8 h-8 rounded-full mx-auto mb-2" style="background:#5c7a4e;"></div>
+          <p class="text-xs font-semibold italic" style="color:#2c2c27; font-family: Georgia, serif;">Nature</p>
+        </div>
+        <div class="p-3 space-y-1" style="background:#f0ece4;">
+          <div class="h-1 rounded-full w-3/4" style="background:#c8d9bf;"></div>
+          <div class="h-1 rounded-full w-1/2" style="background:#dde8d6;"></div>
+          <div class="h-3 rounded-full w-1/3 mt-1" style="background:#5c7a4e;"></div>
+        </div>
+      </div>
+      <p class="text-center text-xs font-medium text-gray-600 mt-2">Nature</p>
+      <p class="text-center text-xs text-gray-400">Naturo, yoga</p>
+    </label>
+
+    <label class="cursor-pointer group">
+      <input type="radio" name="template" value="premium" class="sr-only peer">
+      <div class="rounded-2xl overflow-hidden border-2 transition peer-checked:border-red-700 peer-checked:shadow-lg border-gray-200 group-hover:border-gray-300">
+        <div class="bg-white px-4 py-6 text-center border-b border-gray-100">
+          <div class="w-8 h-8 rounded-full mx-auto mb-2" style="background:#c41e3a;"></div>
+          <p class="text-xs font-bold text-gray-900">Premium</p>
+        </div>
+        <div class="bg-gray-50 p-3 space-y-1">
+          <div class="h-1 bg-gray-200 rounded w-3/4"></div>
+          <div class="h-1 bg-gray-100 rounded w-1/2"></div>
+          <div class="h-3 rounded w-1/3 mt-1" style="background:#c41e3a;"></div>
+        </div>
+      </div>
+      <p class="text-center text-xs font-medium text-gray-600 mt-2">Premium</p>
+      <p class="text-center text-xs text-gray-400">Médecin, avocat</p>
     </label>
   </div>
 

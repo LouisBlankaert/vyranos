@@ -176,3 +176,17 @@ Path SQLite : `/Users/louisblankaert/Desktop/vyranos/instance/vyranos.db`
 ## Lancer Claude Code
 Toujours lancer depuis `/Users/louisblankaert/Desktop/vyranos/` (pas l'ancien chemin `localsite`).
 Sans ça, le tool Bash ne fonctionne pas (répertoire de travail invalide).
+
+## Déploiement Railway
+- Hébergé sur Railway : service Flask + plugin PostgreSQL
+- `DATABASE_URL` injectée automatiquement par Railway (format `postgres://` → corrigé en `postgresql://` dans `__init__.py`)
+- Serveur de prod : Gunicorn via `Procfile`
+- Python 3.12 forcé via `.python-version`
+- Variables d'env à définir dans Railway → service Flask → Variables : `SECRET_KEY`, `STRIPE_*`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `FLASK_ENV=production`
+- Voir la DB : bloc PostgreSQL → onglet Data (ou Connect pour TablePlus)
+- Domaine : Settings → Networking → Custom Domain → `vyranos.app` (CNAME à configurer chez le registrar)
+
+### Fichiers ajoutés pour Railway
+- `Procfile` : `web: gunicorn run:app --bind 0.0.0.0:$PORT`
+- `.python-version` : `3.12`
+- `requirements.txt` : ajout de `gunicorn==21.2.0` et `psycopg2-binary==2.9.9`

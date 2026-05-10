@@ -35,7 +35,7 @@
         Voir une démo
       </a>
     </div>
-    <p class="mt-6 text-sm text-gray-400">Puis {{ prix }}€/mois — annulez quand vous voulez.</p>
+    <p class="mt-6 text-sm text-gray-400">7 jours gratuits, annulables · Puis 69€/mois — engagement 6 mois.</p>
   </div>
 </section>
 
@@ -170,21 +170,8 @@
     <h2 class="text-3xl font-bold mb-4">Un prix simple</h2>
     <p class="text-gray-500 mb-12">Tout inclus, aucune surprise.</p>
     <div class="bg-white rounded-3xl shadow-xl border border-gray-100 p-10">
-      {% if promo_active %}
-      <!-- PROMO BADGE -->
-      <div class="inline-flex items-center gap-2 bg-red-50 text-red-600 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
-        <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
-        Offre limitée — jusqu'au 30 mai 2026
-      </div>
-      <div class="flex items-end gap-3 mb-1">
-        <div class="text-5xl font-bold">29€<span class="text-xl text-gray-400 font-normal">/mois</span></div>
-        <div class="text-lg text-gray-300 line-through mb-1">69€</div>
-      </div>
-      <p class="text-gray-400 text-sm mb-8">Essai gratuit 7 jours · Puis 69€/mois après le 30 mai</p>
-      {% else %}
       <div class="text-5xl font-bold mb-1">69€<span class="text-xl text-gray-400 font-normal">/mois</span></div>
-      <p class="text-gray-400 text-sm mb-8">Essai gratuit 7 jours · Sans engagement</p>
-      {% endif %}
+      <p class="text-gray-400 text-sm mb-8">7 jours gratuits annulables · Puis 69€/mois — engagement 6 mois</p>
       <ul class="text-left space-y-3 mb-10">
         {% for item in ['Page landing personnalisée', 'Système de réservation', 'URL unique publique', 'Tableau de bord commerçant', 'Gestion des horaires et services', '5 templates au choix', 'Agenda dynamique avec créneaux', 'Support inclus'] %}
         <li class="flex items-center gap-3 text-sm">
@@ -198,6 +185,16 @@
       </a>
       <p class="text-center text-xs text-gray-400 mt-4">Sans carte bancaire · Annulez quand vous voulez</p>
     </div>
+
+    <!-- OPTION DOMAINE -->
+    <div class="mt-6 bg-white rounded-2xl border border-gray-200 p-6 flex items-center justify-between gap-6">
+      <div>
+        <p class="font-semibold text-gray-900 text-sm">Option domaine personnalisé</p>
+        <p class="text-gray-500 text-sm mt-0.5">Votre page accessible sur <span class="font-mono">moncommerce.be</span> — on s'occupe de tout.</p>
+      </div>
+      <span class="text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-2 rounded-xl flex-shrink-0">+10€/mois</span>
+    </div>
+
   </div>
 </section>
 
@@ -244,18 +241,22 @@
           </div>
         </div>
 
-        <!-- PRIX -->
+        <!-- CONTACT -->
         <div class="bg-indigo-600 p-10 md:p-14 flex flex-col justify-center items-center text-center">
-          <p class="text-indigo-200 text-sm font-medium uppercase tracking-widest mb-4">Tarif unique</p>
-          <div class="text-7xl font-black text-white mb-2">799€</div>
-          <p class="text-indigo-200 text-sm mb-8">Paiement en une fois · Sans abonnement</p>
-          <div class="w-full bg-indigo-500/40 rounded-2xl p-6">
+          <p class="text-indigo-200 text-sm font-medium uppercase tracking-widest mb-4">Tarif</p>
+          <div class="text-4xl font-black text-white mb-2">Sur rendez-vous</div>
+          <p class="text-indigo-200 text-sm mb-8">Chaque projet est unique — discutons-en.</p>
+          <div class="w-full bg-indigo-500/40 rounded-2xl p-6 mb-8">
             <p class="text-indigo-100 text-sm leading-relaxed">
               Idéal pour les commerces qui ont une identité forte et veulent une page qui leur ressemble vraiment.
             </p>
           </div>
+          <a href="mailto:blankaertlouis@outlook.com?subject=Demande site sur mesure"
+            class="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 text-indigo-700 font-bold px-8 py-4 rounded-xl transition text-sm">
+            M'envoyer un message
+          </a>
           <p class="text-indigo-300 text-xs mt-6">
-            Vous pouvez aussi opter pour le plan 30€/mois et gérer vous-même.
+            Vous pouvez aussi opter pour le plan 69€/mois et gérer vous-même.
           </p>
         </div>
 

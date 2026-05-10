@@ -8,6 +8,17 @@ from .. import db
 dashboard_bp = Blueprint('dashboard', __name__)
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'static', 'uploads')
+
+
+@dashboard_bp.before_request
+def check_subscription():
+    from flask_login import current_user
+    from flask import redirect, url_for, flash
+    if not current_user.is_authenticated:
+        return
+    if not current_user.is_subscribed():
+        flash("Votre essai gratuit est terminé. Activez votre abonnement pour continuer.", 'error')
+        return redirect(url_for('billing.index'))
 ALLOWED = {'png', 'jpg', 'jpeg', 'webp'}
 
 
@@ -211,6 +222,28 @@ def template():
         db.session.commit()
         flash('Template mis à jour.', 'success')
     return render_template('dashboard/template.html', business=business)
+
+
+@dashboard_bp.route('/domaine', methods=['GET', 'POST'])
+@login_required
+def domaine():
+    b = current_user.business
+    if request.method == 'POST':
+        raw = request.form.get('custom_domain', '').strip().lower()
+        domain = raw.replace('https://', '').replace('http://', '').replace('www.', '').strip('/')
+        if domain:
+            existing = Business.query.filter(Business.custom_domain == domain, Business.id != b.id).first()
+            if existing:
+                flash('Ce domaine est déjà utilisé par un autre compte.', 'error')
+            else:
+                b.custom_domain = domain
+                db.session.commit()
+                flash('Domaine enregistré. Pensez à configurer votre CNAME.', 'success')
+        else:
+            b.custom_domain = None
+            db.session.commit()
+            flash('Domaine personnalisé retiré.', 'success')
+    return render_template('dashboard/domaine.html', business=b)
 
 
 @dashboard_bp.route('/horaires', methods=['GET', 'POST'])

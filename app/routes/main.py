@@ -142,10 +142,7 @@ def make_obj(d):
 
 @main_bp.route('/')
 def index():
-    promo_end = date(2026, 5, 30)
-    promo_active = date.today() <= promo_end
-    prix = 29 if promo_active else 69
-    return render_template('index.html', promo_active=promo_active, prix=prix)
+    return render_template('index.html')
 
 
 @main_bp.route('/demo')

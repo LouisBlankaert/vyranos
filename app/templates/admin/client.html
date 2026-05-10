@@ -7,7 +7,17 @@
     <a href="{{ url_for('admin.index') }}" class="text-gray-400 hover:text-white text-sm transition">← Tous les clients</a>
     <span class="text-gray-700">|</span>
     <span class="text-white font-medium text-sm">{{ client.business.nom if client.business else client.email }}</span>
-    <a href="{{ url_for('admin.logout') }}" class="text-gray-400 hover:text-white text-sm transition ml-auto">Déconnexion</a>
+    <div class="ml-auto flex items-center gap-4">
+      <form method="POST" action="{{ url_for('admin.toggle_client', user_id=client.id) }}"
+        onsubmit="return confirm('{{ 'Réactiver ce compte ?' if not client.is_active else 'Suspendre ce compte ? Le client ne pourra plus accéder à son dashboard.' }}')">
+        <button type="submit"
+          class="text-xs font-medium px-4 py-1.5 rounded-lg transition
+            {{ 'bg-green-600 hover:bg-green-700 text-white' if not client.is_active else 'bg-red-600 hover:bg-red-700 text-white' }}">
+          {{ 'Réactiver le compte' if not client.is_active else 'Suspendre le compte' }}
+        </button>
+      </form>
+      <a href="{{ url_for('admin.logout') }}" class="text-gray-400 hover:text-white text-sm transition">Déconnexion</a>
+    </div>
   </nav>
 
   <div class="max-w-5xl mx-auto px-6 py-10 space-y-8">
@@ -74,6 +84,56 @@
           </div>
         </dl>
       </div>
+    </div>
+
+    <!-- DOMAINE PERSONNALISÉ -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-gray-900">Domaine personnalisé</h2>
+        {% if client.business and client.business.custom_domain %}
+        <span class="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded-lg font-medium">+10€/mois</span>
+        {% endif %}
+      </div>
+      {% if client.business %}
+      <form method="POST" action="{{ url_for('admin.set_domaine', user_id=client.id) }}" class="flex gap-3 mb-5">
+        <input type="text" name="custom_domain"
+          value="{{ client.business.custom_domain or '' }}"
+          placeholder="ex : moncommerce.be"
+          class="flex-1 rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-mono">
+        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition flex-shrink-0">
+          Enregistrer
+        </button>
+        {% if client.business.custom_domain %}
+        <button type="submit" name="custom_domain" value=""
+          class="border border-gray-200 hover:border-red-200 hover:text-red-500 text-gray-400 px-4 py-2.5 rounded-xl text-sm transition flex-shrink-0">
+          Retirer
+        </button>
+        {% endif %}
+      </form>
+      {% if client.business.custom_domain %}
+      <div class="bg-gray-50 rounded-xl p-4 text-sm">
+        <p class="font-medium text-gray-700 mb-3">Checklist configuration</p>
+        <div class="space-y-2 text-gray-500">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="rounded"> Domaine acheté
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="rounded"> CNAME configuré chez le registrar (<code class="text-xs bg-gray-200 px-1 py-0.5 rounded">@ → vyranos.app</code>)
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="rounded"> Domaine ajouté dans Railway (Settings → Networking → Custom Domain)
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="rounded"> HTTPS actif — domaine testé ✓
+          </label>
+        </div>
+      </div>
+      {% else %}
+      <p class="text-sm text-gray-400">Aucun domaine configuré pour ce client.</p>
+      {% endif %}
+      {% else %}
+      <p class="text-sm text-gray-400">Le client n'a pas encore créé son commerce.</p>
+      {% endif %}
     </div>
 
     <!-- STATS -->

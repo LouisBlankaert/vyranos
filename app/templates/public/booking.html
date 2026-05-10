@@ -73,7 +73,7 @@
                   <p class="text-xs text-gray-400 mt-0.5">{{ s.duree_minutes }} min</p>
                 </div>
               </div>
-              <p class="font-bold text-sm text-gray-900 flex-shrink-0">{% if s.prix > 0 %}{{ '%.0f'|format(s.prix) }}€{% else %}Gratuit{% endif %}</p>
+              <p class="font-bold text-sm text-gray-900 flex-shrink-0">Sur rendez-vous</p>
             </div>
             {% endfor %}
           </div>
@@ -294,7 +294,7 @@ function updateSummary() {
   if (ready) {
     const [y, m, d] = selDateStr.split('-');
     const dateLabel = `${d}/${m}/${y}`;
-    const prixLabel = selPrix > 0 ? `${selPrix}€` : 'Gratuit';
+    const prixLabel = 'Sur rendez-vous';
     box.innerHTML = `
       <div class="space-y-2.5">
         <div class="flex items-center justify-between text-sm">

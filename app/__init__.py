@@ -4,6 +4,32 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from dotenv import load_dotenv
 
+
+class CustomDomainMiddleware:
+    """Rewrites paths for custom domains: boulangerie.com/booking → /slug/booking"""
+    def __init__(self, wsgi_app, flask_app):
+        self.wsgi_app = wsgi_app
+        self.flask_app = flask_app
+
+    def __call__(self, environ, start_response):
+        host = environ.get('HTTP_HOST', '').split(':')[0].lower().strip()
+        skip = ['vyranos', 'localhost', '127.0.0.1', 'railway']
+        if not host or any(k in host for k in skip):
+            return self.wsgi_app(environ, start_response)
+        with self.flask_app.app_context():
+            from .models import Business
+            try:
+                biz = Business.query.filter(
+                    db.func.lower(Business.custom_domain) == host
+                ).first()
+            except Exception:
+                biz = None
+        if not biz:
+            return self.wsgi_app(environ, start_response)
+        path = environ.get('PATH_INFO', '/')
+        environ['PATH_INFO'] = f'/{biz.user.slug}' if path in ('', '/') else f'/{biz.user.slug}{path}'
+        return self.wsgi_app(environ, start_response)
+
 load_dotenv()
 
 db = SQLAlchemy()
@@ -50,5 +76,7 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+
+    app.wsgi_app = CustomDomainMiddleware(app.wsgi_app, app)
 
     return app

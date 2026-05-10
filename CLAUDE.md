@@ -8,7 +8,7 @@ SaaS qui permet à n'importe quel commerce local (restaurant, salon, coach, arti
 URL publique style `vyranos.app/<slug>`.
 
 ## Modèle économique
-- Promo 29€/mois jusqu'au 30 mai 2026, puis 69€/mois (géré dynamiquement dans `main.py`)
+- **69€/mois** (prix fixe, plus de promo)
 - Essai gratuit 7 jours
 - Cible : commerces locaux belges/français
 
@@ -28,7 +28,7 @@ app/
   __init__.py                   # Factory Flask, init db + login_manager
   models.py                     # User, Business, Service, Reservation, Blocage, Subscription
   routes/
-    main.py                     # / et /demo/* (données démo hardcodées + prix dynamique)
+    main.py                     # / et /demo/* (données démo hardcodées)
     auth.py                     # /signup /login /logout
     onboarding.py               # /onboarding/step1..5
     dashboard.py                # /dashboard/*
@@ -37,7 +37,7 @@ app/
     admin.py                    # /admin/* (panneau superadmin, auth session séparée)
   templates/
     base.html                   # Layout de base avec toasts flash (auto-dismiss 4s)
-    index.html                  # Landing SaaS (prix dynamique, 5 templates cliquables)
+    index.html                  # Landing SaaS (69€/mois, 5 templates cliquables)
     demo.html                   # Page choix des 5 templates avec aperçu
     auth/                       # signup.html, login.html
     onboarding/                 # layout.html, step1..5.html
@@ -66,6 +66,7 @@ instance/vyranos.db           # Base SQLite (dev)
 ### Business (infos du commerce)
 - user_id, nom, description, adresse, ville, telephone, email_contact, instagram, tiktok
 - logo_url, cover_url, couleur_primaire (#hex), horaires (JSON), template, creneau_step (int, défaut 30)
+- custom_domain (nullable, unique) — domaine personnalisé ex: `moncommerce.be`
 
 ### Service
 - business_id, nom, description, duree_minutes, prix, actif
@@ -83,7 +84,7 @@ instance/vyranos.db           # Base SQLite (dev)
 ## Pages
 
 ### Côté SaaS (public)
-- `/` → landing (prix 29€ ou 69€ selon date, 5 templates cliquables)
+- `/` → landing (69€/mois, 5 templates cliquables)
 - `/demo` → choix des 5 templates
 - `/demo/<template>` → démo complète avec données fictives (elegant/moderne/minimal/nature/premium)
 - `/signup` `/login` `/logout`
@@ -97,6 +98,7 @@ instance/vyranos.db           # Base SQLite (dev)
 - `/dashboard/horaires` → horaires par jour + intervalle entre créneaux (15/30/45/60/90 min)
 - `/dashboard/reservations` → **agenda semaine visuel** + pauses/blocages
 - `/dashboard/template` → choix parmi 5 templates avec aperçu
+- `/dashboard/domaine` → configurer un domaine personnalisé (CNAME + instructions)
 
 ### Côté public (page client)
 - `/<slug>` → landing page du commerce (template sélectionné)
@@ -105,8 +107,9 @@ instance/vyranos.db           # Base SQLite (dev)
 
 ### Admin (superadmin)
 - `/admin/login` → auth session (email + mdp depuis .env)
-- `/admin` → liste tous les clients
-- `/admin/client/<id>` → détail client + ses réservations
+- `/admin` → dashboard avec 5 stats : clients inscrits, abonnés actifs, en essai, réservations totales, MRR (abonnés × 69€)
+- `/admin/client/<id>` → détail client + ses réservations + bouton suspendre/réactiver
+- `/admin/client/<id>/toggle` POST → bascule `is_active` (Flask-Login bloque immédiatement)
 
 ## Logique métier
 
@@ -122,9 +125,19 @@ instance/vyranos.db           # Base SQLite (dev)
 - Pauses affichées en hachuré gris
 - Clic → panneau latéral d'édition/suppression
 
-### Prix dynamique landing
-- Avant le 30/05/2026 : badge promo + 29€ barré 69€
-- Après le 30/05/2026 : 69€ sans badge
+### Prix
+- 69€/mois fixe, essai gratuit 7 jours, engagement 6 mois après 1er paiement
+- Les services publics affichent "Sur rendez-vous" à la place du prix (le prix reste en base pour usage interne)
+
+### Gestion trial expiré
+- `before_request` dans `dashboard_bp` : redirige vers `/billing` si `is_subscribed()` retourne False
+- S'applique à toutes les routes `/dashboard/*` automatiquement
+
+### Domaines personnalisés
+- Champ `custom_domain` sur Business (ex: `moncommerce.be`)
+- `CustomDomainMiddleware` dans `__init__.py` : intercepte les requêtes WSGI, détecte le host, réécrit le path vers `/<slug>/...` avant que Flask route
+- Le client configure un CNAME vers `vyranos.app` chez son registrar
+- Louis doit ajouter le domaine manuellement dans Railway (Settings → Networking → Custom Domain) pour activer le HTTPS
 
 ### Auth admin
 - Séparée de Flask-Login (session['admin_logged_in'])
@@ -141,7 +154,9 @@ Tous utilisent `--primary` (CSS variable) pour boutons/accents/prix. Couleur cho
 
 En mode démo (`is_demo=True`) : bannière couleur primaire + boutons → `/signup`.
 
-## Variables d'environnement (.env)
+## Variables d'environnement
+
+### Local (.env)
 ```
 SECRET_KEY=
 DATABASE_URL=sqlite:///vyranos.db
@@ -153,6 +168,16 @@ ADMIN_EMAIL=blankaertlouis@outlook.com
 ADMIN_PASSWORD=Bl@nk@3rt
 ```
 
+### Prod (Railway → service web → Variables)
+```
+SECRET_KEY=vyranos-super-secret-key-2026
+DATABASE_URL=postgresql://postgres:oTZZjNhiyrtmTyJiFlfEbpQIQbiZBypH@postgres.railway.internal:5432/railway
+ADMIN_EMAIL=blankaertlouis@outlook.com
+ADMIN_PASSWORD=Bl@nk@3rt
+FLASK_ENV=production
+STRIPE_* → à ajouter quand Stripe sera configuré
+```
+
 ## Lancer en dev
 ```bash
 venv/bin/python run.py
@@ -162,31 +187,35 @@ venv/bin/python run.py
 ## Kill le port
 ```bash
 lsof -ti :5001 | xargs kill -9
-# ou Ctrl+C dans le terminal Flask
 ```
 
-## TablePlus (DB)
-Path SQLite : `/Users/louisblankaert/Desktop/vyranos/instance/vyranos.db`
+## TablePlus
+- **Local** : SQLite → `/Users/louisblankaert/Desktop/vyranos/instance/vyranos.db`
+- **Prod** : PostgreSQL → host `switchback.proxy.rlwy.net`, port `36896`, user `postgres`, db `railway`
 
-> **Migration DB** : si `instance/localsite.db` existe encore (ancienne session), faire :
-> ```bash
-> rm instance/vyranos.db && mv instance/localsite.db instance/vyranos.db
-> ```
-
-## Lancer Claude Code
-Toujours lancer depuis `/Users/louisblankaert/Desktop/vyranos/` (pas l'ancien chemin `localsite`).
-Sans ça, le tool Bash ne fonctionne pas (répertoire de travail invalide).
+### Supprimer un user en prod (contraintes FK)
+Ordre : `reservation` → `blocage` → `service` → `business` → `subscription` → `user`
 
 ## Déploiement Railway
-- Hébergé sur Railway : service Flask + plugin PostgreSQL
-- `DATABASE_URL` injectée automatiquement par Railway (format `postgres://` → corrigé en `postgresql://` dans `__init__.py`)
-- Serveur de prod : Gunicorn via `Procfile`
-- Python 3.12 forcé via `.python-version`
-- Variables d'env à définir dans Railway → service Flask → Variables : `SECRET_KEY`, `STRIPE_*`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `FLASK_ENV=production`
-- Voir la DB : bloc PostgreSQL → onglet Data (ou Connect pour TablePlus)
-- Domaine : Settings → Networking → Custom Domain → `vyranos.app` (CNAME à configurer chez le registrar)
+- Service Flask + plugin PostgreSQL
+- Gunicorn via `Procfile`, Python 3.12 via `.python-version`
+- Chaque `git push` → redéploiement automatique
+- Domaine custom : Settings → Networking → Custom Domain → `vyranos.app` (à faire quand domaine acheté)
 
-### Fichiers ajoutés pour Railway
-- `Procfile` : `web: gunicorn run:app --bind 0.0.0.0:$PORT`
-- `.python-version` : `3.12`
-- `requirements.txt` : ajout de `gunicorn==21.2.0` et `psycopg2-binary==2.9.9`
+## Lancer Claude Code
+Toujours lancer depuis `/Users/louisblankaert/Desktop/vyranos/`.
+
+## À faire
+1. **Stripe** — abonnement récurrent, webhook, activation compte après trial
+2. **Uploads prod** — logos/covers éphémères sur Railway → migrer vers Cloudinary ou S3
+3. **Domaine `vyranos.app`** — acheter + configurer CNAME dans Railway
+4. **Emails transactionnels (Resend)** — 3 emails à implémenter :
+   - Notif à Louis quand un nouveau client s'inscrit
+   - Confirmation de réservation au client final
+   - Notification au commerçant quand il a un nouveau RDV
+
+## Fait
+- ✅ Gestion trial expiré — dashboard bloqué automatiquement
+- ✅ Domaines personnalisés — CNAME + WSGI middleware + page dashboard
+- ✅ Admin enrichi — MRR, stats trial, suspendre/réactiver compte
+- ✅ Prix 69€/mois partout, engagement 6 mois, plus de promo

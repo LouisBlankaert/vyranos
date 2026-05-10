@@ -19,7 +19,7 @@
 <body class="text-gray-100 antialiased" style="background:#1e1e2e;">
 
 {% if is_demo is defined and is_demo %}
-<div class="text-center py-3 px-4 text-sm font-medium" style="background:var(--primary); color:#1e1e2e;">
+<div class="text-center py-3 px-4 text-sm font-medium" style="background:var(--primary); color:#fff;">
   Ceci est une démo Vyranos — <a href="/signup" class="underline">Créez votre page gratuitement →</a>
 </div>
 {% endif %}
@@ -95,7 +95,7 @@
         </div>
         <div class="flex items-center gap-8 text-right">
           <span class="text-gray-500 text-sm">{{ s.duree_minutes }} min</span>
-          <span class="font-display text-2xl text-primary">{{ '%.0f'|format(s.prix) }}€</span>
+          <span class="font-display text-2xl text-primary">Sur rendez-vous</span>
         </div>
       </div>
       {% endfor %}
@@ -103,7 +103,7 @@
     <div class="mt-14 flex justify-center">
       <a href="{{ '/signup' if (is_demo is defined and is_demo) else '/' + user.slug + '/booking' }}"
         class="inline-flex items-center gap-4 px-10 py-4 text-sm tracking-widest uppercase font-medium transition"
-        style="background:var(--primary); color:#1e1e2e;">
+        style="background:var(--primary); color:#fff; letter-spacing:0.15em;">
         {{ 'Créer ma page' if (is_demo is defined and is_demo) else 'Réserver maintenant' }}
       </a>
     </div>

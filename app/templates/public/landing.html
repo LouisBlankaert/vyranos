@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ business.nom }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --primary: {{ business.couleur_primaire or '#1a1a1a' }}; }
+    body { font-family: 'Inter', sans-serif; }
+    .btn-primary { background-color: var(--primary); color: #fff; }
+    .btn-primary:hover { opacity: 0.88; }
+    .text-primary { color: var(--primary); }
+    .border-primary { border-color: var(--primary); }
+  </style>
+</head>
+<body class="bg-white text-gray-900 antialiased">
+
+  <!-- HERO -->
+  <section class="relative">
+    {% if business.cover_url %}
+    <div class="h-72 sm:h-96 bg-gray-900 overflow-hidden">
+      <img src="{{ business.cover_url }}" alt="cover" class="w-full h-full object-cover opacity-70">
+    </div>
+    {% else %}
+    <div class="h-64 sm:h-80" style="background-color: var(--primary); opacity: 0.08;"></div>
+    {% endif %}
+
+    <div class="max-w-3xl mx-auto px-6 {% if business.cover_url %}-mt-16 relative{% else 'pt-12'%}">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex gap-6 items-start">
+        {% if business.logo_url %}
+        <img src="{{ business.logo_url }}" alt="logo" class="w-16 h-16 rounded-xl object-cover flex-shrink-0 border border-gray-100">
+        {% else %}
+        <div class="w-16 h-16 rounded-xl flex-shrink-0 flex items-center justify-center text-2xl font-bold text-white"
+             style="background-color: var(--primary);">
+          {{ business.nom[0].upper() }}
+        </div>
+        {% endif %}
+        <div class="min-w-0">
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">{{ business.nom }}</h1>
+          {% if business.description %}
+          <p class="mt-2 text-gray-500 leading-relaxed">{{ business.description }}</p>
+          {% endif %}
+          <div class="mt-3 flex flex-wrap gap-3 text-sm text-gray-400">
+            {% if business.ville %}<span>📍 {{ business.ville }}</span>{% endif %}
+            {% if business.telephone %}<span>📞 {{ business.telephone }}</span>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="max-w-3xl mx-auto px-6 py-12">
+    <h2 class="text-xl font-bold text-gray-900 mb-6">Nos services</h2>
+    {% if services %}
+    <div class="grid sm:grid-cols-2 gap-4">
+      {% for s in services %}
+      <a href="{{ url_for('public.booking', slug=user.slug, service_id=s.id) }}"
+         class="group block bg-white border border-gray-100 rounded-2xl p-5 hover:border-gray-300 hover:shadow-sm transition">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h3 class="font-semibold text-gray-900 group-hover:text-primary transition">{{ s.nom }}</h3>
+            {% if s.description %}
+            <p class="text-sm text-gray-400 mt-1 leading-snug">{{ s.description }}</p>
+            {% endif %}
+          </div>
+          <span class="text-xs text-gray-400 flex-shrink-0 mt-0.5">{{ s.duree_minutes }} min</span>
+        </div>
+        <div class="mt-4 flex items-center justify-between">
+          <span class="text-sm font-medium" style="color: var(--primary);">Sur rendez-vous</span>
+          <span class="text-xs btn-primary px-3 py-1.5 rounded-lg font-medium opacity-0 group-hover:opacity-100 transition">
+            Réserver →
+          </span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-gray-400 text-sm">Aucun service disponible pour le moment.</p>
+    {% endif %}
+  </section>
+
+  <!-- HORAIRES -->
+  {% if business.horaires %}
+  <section class="max-w-3xl mx-auto px-6 pb-12">
+    <div class="bg-gray-50 rounded-2xl p-6">
+      <h2 class="text-base font-bold text-gray-900 mb-4">Horaires</h2>
+      <div class="grid sm:grid-cols-2 gap-1 text-sm">
+        {% set jours = [('lundi','Lundi'),('mardi','Mardi'),('mercredi','Mercredi'),('jeudi','Jeudi'),('vendredi','Vendredi'),('samedi','Samedi'),('dimanche','Dimanche')] %}
+        {% for key, label in jours %}
+          {% set j = business.horaires.get(key, {}) %}
+          <div class="flex justify-between py-1.5 border-b border-gray-100 last:border-0">
+            <span class="text-gray-500 font-medium">{{ label }}</span>
+            {% if j.get('ouvert') %}
+            <span class="text-gray-800">{{ j.debut }} – {{ j.fin }}</span>
+            {% else %}
+            <span class="text-gray-300">Fermé</span>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- FOOTER -->
+  <footer class="border-t border-gray-100 py-8">
+    <div class="max-w-3xl mx-auto px-6 flex flex-wrap gap-4 items-center justify-between text-sm text-gray-400">
+      <div class="flex gap-4">
+        {% if business.instagram %}
+        <a href="https://instagram.com/{{ business.instagram|replace('@','') }}" target="_blank"
+           class="hover:text-gray-700 transition">Instagram</a>
+        {% endif %}
+        {% if business.tiktok %}
+        <a href="https://tiktok.com/{{ business.tiktok|replace('@','') }}" target="_blank"
+           class="hover:text-gray-700 transition">TikTok</a>
+        {% endif %}
+        {% if business.email_contact %}
+        <a href="mailto:{{ business.email_contact }}" class="hover:text-gray-700 transition">
+          {{ business.email_contact }}
+        </a>
+        {% endif %}
+      </div>
+      <a href="{{ url_for('public.booking', slug=user.slug) }}"
+         class="btn-primary px-5 py-2.5 rounded-xl font-semibold text-sm transition">
+        Prendre rendez-vous
+      </a>
+    </div>
+  </footer>
+
+</body>
+</html>

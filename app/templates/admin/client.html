@@ -23,76 +23,42 @@
   <div class="max-w-5xl mx-auto px-6 py-10 space-y-8">
 
     <!-- INFOS CLIENT -->
-    <div class="grid grid-cols-2 gap-6">
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <h2 class="font-semibold text-gray-900 mb-4">Informations</h2>
-        <dl class="space-y-3 text-sm">
-          <div class="flex justify-between">
-            <dt class="text-gray-500">Email</dt>
-            <dd class="font-medium">{{ client.email }}</dd>
-          </div>
-          <div class="flex justify-between">
-            <dt class="text-gray-500">Slug</dt>
-            <dd>
-              <a href="/{{ client.slug }}" target="_blank" class="text-indigo-600 hover:underline font-medium">
-                /{{ client.slug }}
-              </a>
-            </dd>
-          </div>
-          <div class="flex justify-between">
-            <dt class="text-gray-500">Inscrit le</dt>
-            <dd class="font-medium">{{ client.created_at.strftime('%d/%m/%Y à %H:%M') }}</dd>
-          </div>
-          <div class="flex justify-between">
-            <dt class="text-gray-500">Essai jusqu'au</dt>
-            <dd class="font-medium">{{ client.trial_ends_at.strftime('%d/%m/%Y') if client.trial_ends_at else '—' }}</dd>
-          </div>
-          <div class="flex justify-between">
-            <dt class="text-gray-500">Template</dt>
-            <dd class="font-medium capitalize">{{ client.business.template if client.business else '—' }}</dd>
-          </div>
-        </dl>
-      </div>
-
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <h2 class="font-semibold text-gray-900 mb-4">Abonnement</h2>
-        <dl class="space-y-3 text-sm">
-          {% if client.subscription %}
-          <div class="flex justify-between">
-            <dt class="text-gray-500">Statut</dt>
-            <dd>
-              <span class="text-xs px-2 py-1 rounded-lg font-medium
-                {{ 'bg-green-50 text-green-700' if client.subscription.statut == 'active' else 'bg-red-50 text-red-700' }}">
-                {{ client.subscription.statut }}
-              </span>
-            </dd>
-          </div>
-          <div class="flex justify-between">
-            <dt class="text-gray-500">ID Stripe</dt>
-            <dd class="font-mono text-xs text-gray-500 truncate max-w-[180px]">{{ client.subscription.stripe_subscription_id or '—' }}</dd>
-          </div>
-          <div class="flex justify-between">
-            <dt class="text-gray-500">Fin de période</dt>
-            <dd class="font-medium">{{ client.subscription.current_period_end.strftime('%d/%m/%Y') if client.subscription.current_period_end else '—' }}</dd>
-          </div>
-          {% else %}
-          <p class="text-gray-400">Aucun abonnement Stripe.</p>
-          {% endif %}
-          <div class="flex justify-between">
-            <dt class="text-gray-500">Stripe customer</dt>
-            <dd class="font-mono text-xs text-gray-500 truncate max-w-[180px]">{{ client.stripe_customer_id or '—' }}</dd>
-          </div>
-        </dl>
-      </div>
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <h2 class="font-semibold text-gray-900 mb-4">Informations</h2>
+      <dl class="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+        <div class="flex justify-between col-span-1">
+          <dt class="text-gray-500">Email</dt>
+          <dd class="font-medium">{{ client.email }}</dd>
+        </div>
+        <div class="flex justify-between col-span-1">
+          <dt class="text-gray-500">Slug</dt>
+          <dd>
+            <a href="/{{ client.slug }}" target="_blank" class="text-indigo-600 hover:underline font-medium">
+              /{{ client.slug }}
+            </a>
+          </dd>
+        </div>
+        <div class="flex justify-between col-span-1">
+          <dt class="text-gray-500">Inscrit le</dt>
+          <dd class="font-medium">{{ client.created_at.strftime('%d/%m/%Y à %H:%M') }}</dd>
+        </div>
+        <div class="flex justify-between col-span-1">
+          <dt class="text-gray-500">Statut</dt>
+          <dd>
+            {% if client.is_active %}
+              <span class="text-xs bg-green-50 text-green-700 px-2 py-1 rounded-lg font-medium">Actif</span>
+            {% else %}
+              <span class="text-xs bg-red-50 text-red-600 px-2 py-1 rounded-lg font-medium">Suspendu</span>
+            {% endif %}
+          </dd>
+        </div>
+      </dl>
     </div>
 
     <!-- DOMAINE PERSONNALISÉ -->
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="font-semibold text-gray-900">Domaine personnalisé</h2>
-        {% if client.business and client.business.custom_domain %}
-        <span class="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded-lg font-medium">+10€/mois</span>
-        {% endif %}
       </div>
       {% if client.business %}
       <form method="POST" action="{{ url_for('admin.set_domaine', user_id=client.id) }}" class="flex gap-3 mb-5">

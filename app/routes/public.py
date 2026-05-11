@@ -7,7 +7,7 @@ public_bp = Blueprint('public', __name__)
 
 def parse_time(s):
     h, m = map(int, s.split(':'))
-    return h * 60 + m  # minutes depuis minuit
+    return h * 60 + m
 
 
 def generate_creneaux(business, service, day):
@@ -25,23 +25,19 @@ def generate_creneaux(business, service, day):
 
     duree = service.duree_minutes
 
-    # Récupère toutes les réservations confirmées du jour (tous services)
     reservations = Reservation.query.filter_by(
         business_id=business.id, date=day, statut='confirmé'
     ).all()
 
-    # Récupère les blocages manuels du jour
     blocages = Blocage.query.filter_by(business_id=business.id, date=day).all()
 
     def is_blocked(slot_start_min):
         slot_end_min = slot_start_min + duree
-        # Vérifie chevauchement avec réservations existantes
         for r in reservations:
             r_start = parse_time(r.creneau)
             r_end = r_start + r.service.duree_minutes
             if slot_start_min < r_end and slot_end_min > r_start:
                 return True
-        # Vérifie que le créneau ne COMMENCE PAS pendant un blocage manuel
         for b in blocages:
             b_start = parse_time(b.debut)
             b_end = parse_time(b.fin)
@@ -70,7 +66,7 @@ def landing(slug):
         return render_template('public/404.html'), 404
     services = Service.query.filter_by(business_id=business.id, actif=True).all()
     return render_template(
-        f'public/templates/{business.template}.html',
+        'public/landing.html',
         business=business,
         services=services,
         user=user,

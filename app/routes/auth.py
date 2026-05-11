@@ -1,5 +1,4 @@
 import re
-from datetime import datetime, timedelta, timezone
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from ..models import User, Business
@@ -44,12 +43,7 @@ def signup():
             slug = f'{base_slug}-{counter}'
             counter += 1
 
-        user = User(
-            email=email,
-            slug=slug,
-            trial_ends_at=datetime.now(timezone.utc) + timedelta(days=7),
-            onboarding_step=0,
-        )
+        user = User(email=email, slug=slug)
         user.set_password(password)
         db.session.add(user)
         db.session.flush()
@@ -59,7 +53,7 @@ def signup():
         db.session.commit()
 
         login_user(user)
-        return redirect(url_for('onboarding.step1'))
+        return redirect(url_for('dashboard.index'))
 
     return render_template('auth/signup.html')
 

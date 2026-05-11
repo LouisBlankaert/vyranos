@@ -1,7 +1,6 @@
 import os
-from datetime import datetime, timezone
-from flask import Blueprint, render_template, redirect, url_for, request, flash, session, abort
-from ..models import User, Reservation
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session
+from ..models import User, Business, Reservation
 from .. import db
 
 admin_bp = Blueprint('admin', __name__)
@@ -47,23 +46,15 @@ def logout():
 @admin_required
 def index():
     users = User.query.order_by(User.created_at.desc()).all()
-    now = datetime.now(timezone.utc)
-
     total_reservations = Reservation.query.count()
-    actifs = [u for u in users if u.subscription and u.subscription.statut == 'active']
-    en_trial = [u for u in users if u.trial_ends_at and u.trial_ends_at.replace(tzinfo=timezone.utc) > now and not (u.subscription and u.subscription.statut == 'active')]
-    inactifs = [u for u in users if not u.is_active]
-    mrr_base = len(actifs) * 69
+    nb_actifs = sum(1 for u in users if u.is_active)
     nb_domaines = sum(1 for u in users if u.business and u.business.custom_domain)
-    mrr = mrr_base + nb_domaines * 10
 
     return render_template('admin/index.html',
         users=users,
         total_reservations=total_reservations,
-        nb_actifs=len(actifs),
-        nb_trial=len(en_trial),
+        nb_actifs=nb_actifs,
         nb_domaines=nb_domaines,
-        mrr=mrr,
     )
 
 
@@ -90,7 +81,6 @@ def set_domaine(user_id):
     raw = request.form.get('custom_domain', '').strip().lower()
     domain = raw.replace('https://', '').replace('http://', '').replace('www.', '').strip('/')
     if domain:
-        from ..models import Business
         existing = Business.query.filter(Business.custom_domain == domain, Business.id != user.business.id).first()
         if existing:
             flash('Ce domaine est déjà utilisé par un autre client.', 'error')

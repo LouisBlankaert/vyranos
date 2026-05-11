@@ -61,16 +61,12 @@ def create_app():
     from .routes.auth import auth_bp
     from .routes.dashboard import dashboard_bp
     from .routes.public import public_bp
-    from .routes.onboarding import onboarding_bp
-    from .routes.billing import billing_bp
     from .routes.main import main_bp
     from .routes.admin import admin_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
-    app.register_blueprint(onboarding_bp, url_prefix='/onboarding')
-    app.register_blueprint(billing_bp, url_prefix='/billing')
     app.register_blueprint(admin_bp)
     app.register_blueprint(public_bp)
 

@@ -1,6 +1,6 @@
 import os
 from flask import Blueprint, render_template, redirect, url_for, request, flash, session
-from ..models import User, Business, Reservation
+from ..models import User, Business, Reservation, Lead
 from .. import db
 
 admin_bp = Blueprint('admin', __name__)
@@ -49,13 +49,36 @@ def index():
     total_reservations = Reservation.query.count()
     nb_actifs = sum(1 for u in users if u.is_active)
     nb_domaines = sum(1 for u in users if u.business and u.business.custom_domain)
+    leads = Lead.query.order_by(Lead.created_at.desc()).all()
+    nb_leads_nouveaux = sum(1 for l in leads if not l.lu)
 
     return render_template('admin/index.html',
         users=users,
         total_reservations=total_reservations,
         nb_actifs=nb_actifs,
         nb_domaines=nb_domaines,
+        leads=leads,
+        nb_leads_nouveaux=nb_leads_nouveaux,
     )
+
+
+@admin_bp.route('/admin/lead/<int:lead_id>/lu', methods=['POST'])
+@admin_required
+def mark_lead_lu(lead_id):
+    lead = Lead.query.get_or_404(lead_id)
+    lead.lu = True
+    db.session.commit()
+    return redirect(url_for('admin.index') + '#leads')
+
+
+@admin_bp.route('/admin/lead/<int:lead_id>/supprimer', methods=['POST'])
+@admin_required
+def delete_lead(lead_id):
+    lead = Lead.query.get_or_404(lead_id)
+    db.session.delete(lead)
+    db.session.commit()
+    flash('Lead supprimé.', 'success')
+    return redirect(url_for('admin.index') + '#leads')
 
 
 @admin_bp.route('/admin/client/<int:user_id>')

@@ -14,7 +14,7 @@
   <div class="max-w-6xl mx-auto px-6 py-10">
 
     <!-- STATS -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-10">
       <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
         <p class="text-xs text-gray-500 mb-1">Clients inscrits</p>
         <p class="text-3xl font-bold text-gray-900">{{ users|length }}</p>
@@ -31,6 +31,87 @@
         <p class="text-xs text-gray-500 mb-1">Réservations totales</p>
         <p class="text-3xl font-bold text-indigo-600">{{ total_reservations }}</p>
       </div>
+      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm relative">
+        <p class="text-xs text-gray-500 mb-1">Leads formulaire</p>
+        <p class="text-3xl font-bold text-orange-500">{{ leads|length }}</p>
+        {% if nb_leads_nouveaux > 0 %}
+          <span class="absolute top-3 right-3 text-xs bg-orange-500 text-white px-2 py-0.5 rounded-full font-semibold">{{ nb_leads_nouveaux }} nouveau{% if nb_leads_nouveaux > 1 %}x{% endif %}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- LEADS -->
+    <div id="leads" class="bg-white rounded-2xl border border-gray-100 shadow-sm mb-8">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <h2 class="font-semibold text-gray-900">Demandes prospects</h2>
+          {% if nb_leads_nouveaux > 0 %}
+            <span class="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-semibold">{{ nb_leads_nouveaux }} non lu{% if nb_leads_nouveaux > 1 %}s{% endif %}</span>
+          {% endif %}
+        </div>
+      </div>
+      {% if leads %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm min-w-[900px]">
+          <thead>
+            <tr class="border-b border-gray-100">
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Nom</th>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Commerce</th>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Type</th>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Contact</th>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Message</th>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Reçu le</th>
+              <th class="px-6 py-3"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            {% for lead in leads %}
+            <tr class="hover:bg-gray-50 transition {% if not lead.lu %}bg-orange-50/40{% endif %}">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                  {% if not lead.lu %}
+                    <span class="w-2 h-2 bg-orange-400 rounded-full flex-shrink-0"></span>
+                  {% endif %}
+                  <span class="font-medium text-gray-900">{{ lead.prenom }} {{ lead.nom }}</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-gray-700 font-medium">{{ lead.nom_commerce }}</td>
+              <td class="px-6 py-4">
+                <span class="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded-lg font-medium">{{ lead.type_commerce }}</span>
+              </td>
+              <td class="px-6 py-4">
+                <div class="text-gray-700">{{ lead.email }}</div>
+                <div class="text-gray-400 text-xs">{{ lead.telephone }}</div>
+              </td>
+              <td class="px-6 py-4 text-gray-500 text-xs max-w-xs">
+                {% if lead.message %}
+                  <span class="line-clamp-2" title="{{ lead.message }}">{{ lead.message }}</span>
+                {% else %}
+                  <span class="text-gray-300">—</span>
+                {% endif %}
+              </td>
+              <td class="px-6 py-4 text-gray-400 text-xs whitespace-nowrap">{{ lead.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                  {% if not lead.lu %}
+                    <form method="POST" action="{{ url_for('admin.mark_lead_lu', lead_id=lead.id) }}">
+                      <button type="submit" class="text-xs text-indigo-600 hover:underline font-medium whitespace-nowrap">Marquer lu</button>
+                    </form>
+                  {% endif %}
+                  <form method="POST" action="{{ url_for('admin.delete_lead', lead_id=lead.id) }}"
+                    onsubmit="return confirm('Supprimer ce lead ?')">
+                    <button type="submit" class="text-xs text-red-400 hover:text-red-600 hover:underline font-medium">Suppr.</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="p-12 text-center text-gray-400 text-sm">Aucune demande pour l'instant.</div>
+      {% endif %}
     </div>
 
     <!-- TABLE CLIENTS -->

@@ -82,3 +82,17 @@ class Blocage(db.Model):
     debut = db.Column(db.String(5), nullable=False)
     fin = db.Column(db.String(5), nullable=False)
     motif = db.Column(db.String(100), default='Indisponible')
+
+
+class Lead(db.Model):
+    __tablename__ = 'leads'
+    id = db.Column(db.Integer, primary_key=True)
+    prenom = db.Column(db.String(100), nullable=False)
+    nom = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    telephone = db.Column(db.String(30), nullable=False)
+    nom_commerce = db.Column(db.String(150), nullable=False)
+    type_commerce = db.Column(db.String(100), nullable=False)
+    message = db.Column(db.Text, nullable=True)
+    lu = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))

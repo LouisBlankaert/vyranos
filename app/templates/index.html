@@ -7,8 +7,7 @@
   <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
     <span class="text-xl font-bold tracking-tight">Vyr<span class="text-indigo-600">anos</span></span>
     <div class="flex items-center gap-4">
-      <a href="/login" class="text-sm text-gray-600 hover:text-gray-900 transition">Connexion</a>
-      <a href="mailto:blankaertlouis@outlook.com?subject=Demande site sur mesure"
+      <a href="#contact"
          class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition">
         Demander un devis
       </a>
@@ -31,7 +30,7 @@
       Je crée votre site personnalisé avec un système de réservation intégré. Vous n'avez rien à faire — je m'occupe de tout.
     </p>
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a href="mailto:blankaertlouis@outlook.com?subject=Demande site sur mesure"
+      <a href="#contact"
          class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition shadow-lg shadow-indigo-200">
         Demander mon site →
       </a>
@@ -74,8 +73,8 @@
     <p class="text-gray-500 text-center mb-16">Quatre étapes, zéro prise de tête.</p>
     <div class="space-y-8">
       {% for step in [
-        ('1', 'On se parle', 'Vous me décrivez votre commerce, vos besoins, votre style. Un échange de 20 minutes suffit.'),
-        ('2', 'Je conçois votre site', 'Je crée votre page sur mesure avec votre identité visuelle et votre système de réservation.'),
+        ('1', 'Vous remplissez le formulaire', 'Dites-moi qui vous êtes et ce que fait votre commerce. Ça prend 2 minutes.'),
+        ('2', 'Je vous recontacte', 'On échange rapidement pour affiner votre projet et je vous prépare une première version.'),
         ('3', 'Vous validez', 'Je vous montre le résultat. On ajuste ensemble jusqu\'à ce que ce soit parfait.'),
         ('4', 'C\'est en ligne', 'Je publie votre site. Vos clients peuvent réserver dès maintenant.'),
       ] %}
@@ -93,22 +92,84 @@
   </div>
 </section>
 
-<!-- CTA FINAL -->
-<section class="py-24 px-6 bg-gray-900">
-  <div class="max-w-3xl mx-auto text-center">
-    <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Prêt à avoir votre site ?</h2>
-    <p class="text-gray-400 mb-10 text-lg">Contactez-moi, on discute de votre projet sans engagement.</p>
-    <a href="mailto:blankaertlouis@outlook.com?subject=Demande site sur mesure"
-       class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold px-10 py-5 rounded-xl transition shadow-lg shadow-indigo-900">
-      Demander mon site →
-    </a>
-    <p class="mt-6 text-gray-500 text-sm">Ou écrivez-moi directement : blankaertlouis@outlook.com</p>
+<!-- FORMULAIRE CONTACT -->
+<section id="contact" class="py-24 px-6 bg-gray-50">
+  <div class="max-w-2xl mx-auto">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold text-gray-900 mb-3">Dites-moi tout sur votre commerce</h2>
+      <p class="text-gray-500">Je vous recontacte sous 24h pour discuter de votre projet, sans engagement.</p>
+    </div>
+
+    <form method="POST" action="/#contact" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-6">
+      <!-- Nom / Prénom -->
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Prénom <span class="text-red-400">*</span></label>
+          <input type="text" name="prenom" required placeholder="Jean"
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Nom <span class="text-red-400">*</span></label>
+          <input type="text" name="nom" required placeholder="Dupont"
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+        </div>
+      </div>
+
+      <!-- Nom du commerce -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Nom de votre commerce <span class="text-red-400">*</span></label>
+        <input type="text" name="nom_commerce" required placeholder="Ex: Barbershop Le Grand"
+          class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+      </div>
+
+      <!-- Type de commerce -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Type de commerce <span class="text-red-400">*</span></label>
+        <select name="type_commerce" required
+          class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition bg-white appearance-none">
+          <option value="" disabled selected>Choisissez...</option>
+          {% for t in types_commerce %}
+          <option value="{{ t }}">{{ t }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Email / Téléphone -->
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Email <span class="text-red-400">*</span></label>
+          <input type="email" name="email" required placeholder="jean@moncommerce.be"
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Téléphone <span class="text-red-400">*</span></label>
+          <input type="tel" name="telephone" required placeholder="+32 470 00 00 00"
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+        </div>
+      </div>
+
+      <!-- Message -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Quelque chose à ajouter ? <span class="text-gray-400 font-normal">(optionnel)</span></label>
+        <textarea name="message" rows="3" placeholder="Ex: J'ai déjà un logo, j'aimerais une couleur bleue, je reçois ~20 clients/semaine..."
+          class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition resize-none"></textarea>
+      </div>
+
+      <button type="submit"
+        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-xl transition shadow-lg shadow-indigo-200 text-sm">
+        Envoyer ma demande →
+      </button>
+
+      <p class="text-center text-xs text-gray-400">Je vous réponds sous 24h. Aucun engagement, aucune carte bancaire.</p>
+    </form>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer class="py-10 px-6 bg-white border-t border-gray-100 text-center">
   <span class="text-sm text-gray-400">© 2026 Vyranos. Sites sur mesure pour commerces locaux.</span>
+  <span class="text-gray-200 mx-3">·</span>
+  <a href="/login" class="text-xs text-gray-300 hover:text-gray-500 transition">Espace commerçant</a>
 </footer>
 
 {% endblock %}

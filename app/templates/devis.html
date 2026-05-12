@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% block title %}Demander votre site — Vyranos{% endblock %}
+{% block body %}
+
+<style>
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp .55s cubic-bezier(.16,1,.3,1) both; }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradShift 4s ease infinite;
+  }
+  @keyframes gradShift {
+    0%,100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+  }
+
+  .form-input {
+    transition: border-color .2s, box-shadow .2s, transform .2s cubic-bezier(.34,1.56,.64,1);
+  }
+  .form-input:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px -4px rgba(99,102,241,.18);
+  }
+
+  .btn-submit {
+    transition: transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .2s ease;
+  }
+  .btn-submit:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 12px 32px -6px rgba(99,102,241,.5);
+  }
+  .btn-submit:active { transform: scale(.98); }
+
+  .check-item {
+    animation: fadeUp .5s cubic-bezier(.16,1,.3,1) both;
+  }
+</style>
+
+<!-- NAV minimal -->
+<nav class="fixed top-0 inset-x-0 z-40 bg-white/90 backdrop-blur border-b border-gray-100">
+  <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+    <a href="/" class="text-lg font-bold tracking-tight">Vyr<span class="gradient-text">anos</span></a>
+    <span class="text-xs text-gray-400 hidden sm:block">🔒 Vos informations restent confidentielles</span>
+  </div>
+</nav>
+
+<div class="min-h-screen pt-14 bg-gray-50 flex flex-col lg:flex-row">
+
+  <!-- GAUCHE : réassurance -->
+  <div class="lg:w-2/5 bg-white border-r border-gray-100 px-8 py-16 flex flex-col justify-center">
+    <div class="max-w-sm mx-auto lg:mx-0 lg:ml-auto lg:pr-8">
+
+      <a href="/" class="text-sm text-gray-400 hover:text-gray-600 transition inline-flex items-center gap-1 mb-10">
+        ← Retour
+      </a>
+
+      <div class="fade-up mb-8">
+        <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest mb-3">Votre site sur mesure</p>
+        <h1 class="text-3xl font-bold text-gray-900 leading-snug">
+          Parlez-moi de<br>votre commerce.
+        </h1>
+        <p class="text-gray-500 text-sm mt-3 leading-relaxed">
+          Je vous recontacte sous 24h avec une proposition personnalisée — sans engagement.
+        </p>
+      </div>
+
+      <div class="space-y-4 mb-10">
+        {% for item in [
+          ('🎨', 'Design 100% personnalisé', 'Couleurs, logo, photos — à votre image.'),
+          ('📅', 'Réservations en ligne', 'Vos clients bookent directement depuis votre page.'),
+          ('⚡', 'En ligne en 14 jours', 'Vous validez, je publie. Rapide et sans prise de tête.'),
+          ('🌐', 'Domaine inclus', 'moncommerce.be — je m\'occupe de tout.'),
+        ] %}
+        <div class="check-item flex items-start gap-3" style="animation-delay: {{ loop.index0 * 80 }}ms">
+          <span class="text-xl flex-shrink-0 mt-0.5">{{ item[0] }}</span>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">{{ item[1] }}</p>
+            <p class="text-xs text-gray-400 mt-0.5">{{ item[2] }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="fade-up border-t border-gray-100 pt-6">
+        <p class="text-xs text-gray-400 leading-relaxed">
+          Aucune carte bancaire requise. Je vous envoie une proposition adaptée à votre activité avant toute facturation.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- DROITE : formulaire -->
+  <div class="lg:w-3/5 px-6 py-16 flex items-start justify-center">
+    <div class="w-full max-w-lg fade-up">
+
+      <div class="mb-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-1">Votre projet en quelques lignes</h2>
+        <p class="text-sm text-gray-400">Tous les champs marqués * sont obligatoires.</p>
+      </div>
+
+      <form method="POST" class="space-y-5">
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Prénom <span class="text-red-400">*</span></label>
+            <input type="text" name="prenom" required placeholder="Jean" autofocus
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Nom <span class="text-red-400">*</span></label>
+            <input type="text" name="nom" required placeholder="Dupont"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Nom de votre commerce <span class="text-red-400">*</span></label>
+          <input type="text" name="nom_commerce" required placeholder="Ex : Barbershop Le Grand"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Type de commerce <span class="text-red-400">*</span></label>
+          <select name="type_commerce" required
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white appearance-none">
+            <option value="" disabled selected>Choisissez votre activité…</option>
+            {% for t in types_commerce %}
+            <option value="{{ t }}">{{ t }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Email <span class="text-red-400">*</span></label>
+            <input type="email" name="email" required placeholder="jean@moncommerce.be"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Téléphone <span class="text-red-400">*</span></label>
+            <input type="tel" name="telephone" required placeholder="+32 470 00 00 00"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Quelque chose à ajouter ? <span class="text-gray-400 font-normal">(optionnel)</span></label>
+          <textarea name="message" rows="3"
+            placeholder="Ex : j'ai déjà un logo, je voudrais une couleur bleue, je reçois ~20 clients par semaine…"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white resize-none"></textarea>
+        </div>
+
+        <button type="submit"
+          class="btn-submit w-full bg-indigo-600 text-white font-semibold py-4 rounded-xl shadow-lg shadow-indigo-200 text-sm">
+          Envoyer ma demande →
+        </button>
+
+        <p class="text-center text-xs text-gray-400">Je vous réponds sous 24h. Aucun engagement, aucune carte bancaire.</p>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

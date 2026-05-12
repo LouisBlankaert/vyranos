@@ -18,8 +18,13 @@ TYPES_COMMERCE = [
 ]
 
 
-@main_bp.route('/', methods=['GET', 'POST'])
+@main_bp.route('/')
 def index():
+    return render_template('index.html')
+
+
+@main_bp.route('/devis', methods=['GET', 'POST'])
+def devis():
     if request.method == 'POST':
         prenom = request.form.get('prenom', '').strip()
         nom = request.form.get('nom', '').strip()
@@ -31,7 +36,7 @@ def index():
 
         if not all([prenom, nom, email, telephone, nom_commerce, type_commerce]):
             flash('Merci de remplir tous les champs obligatoires.', 'error')
-            return redirect(url_for('main.index') + '#contact')
+            return render_template('devis.html', types_commerce=TYPES_COMMERCE)
 
         lead = Lead(
             prenom=prenom,
@@ -44,7 +49,11 @@ def index():
         )
         db.session.add(lead)
         db.session.commit()
-        flash('Votre demande a bien été envoyée ! Je vous recontacte très vite.', 'success')
-        return redirect(url_for('main.index') + '#contact')
+        return redirect(url_for('main.merci'))
 
-    return render_template('index.html', types_commerce=TYPES_COMMERCE)
+    return render_template('devis.html', types_commerce=TYPES_COMMERCE)
+
+
+@main_bp.route('/merci')
+def merci():
+    return render_template('merci.html')

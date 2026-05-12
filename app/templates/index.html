@@ -156,7 +156,7 @@
     <span class="text-xl font-bold tracking-tight">Vyr<span class="gradient-text">anos</span></span>
     <div class="flex items-center gap-4">
       <a href="/login" class="text-sm text-gray-500 hover:text-gray-900 transition">Espace commerçant</a>
-      <a href="#contact"
+      <a href="/devis"
          class="btn-primary text-sm bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium">
         Demander un devis
       </a>
@@ -187,7 +187,7 @@
       Je crée votre site personnalisé avec un système de réservation intégré. Vous n'avez rien à faire — je m'occupe de tout.
     </p>
     <div class="hero-ctas flex flex-col sm:flex-row gap-4 justify-center">
-      <a href="#contact"
+      <a href="/devis"
          class="btn-primary inline-flex items-center justify-center bg-indigo-600 text-white text-base font-semibold px-8 py-4 rounded-xl shadow-lg shadow-indigo-200">
         Demander mon site →
       </a>
@@ -270,76 +270,20 @@
   </div>
 </section>
 
-<!-- FORMULAIRE CONTACT -->
-<section id="contact" class="py-24 px-6 bg-gray-50">
-  <div class="max-w-2xl mx-auto">
-    <div class="reveal text-center mb-12">
-      <h2 class="text-3xl font-bold text-gray-900 mb-3 inline-block section-title">Dites-moi tout sur votre commerce</h2>
-      <p class="text-gray-500 mt-4">Je vous recontacte sous 24h pour discuter de votre projet, sans engagement.</p>
+<!-- CTA FINAL -->
+<section class="relative py-20 px-6 text-center overflow-hidden" style="background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 50%, #ede9fe 100%);">
+  <!-- blobs décoratifs -->
+  <div class="absolute w-72 h-72 rounded-full pointer-events-none" style="background:#a5b4fc;filter:blur(80px);opacity:.2;top:-40px;left:-40px;"></div>
+  <div class="absolute w-56 h-56 rounded-full pointer-events-none" style="background:#c4b5fd;filter:blur(70px);opacity:.2;bottom:-20px;right:-20px;"></div>
+  <div class="relative max-w-2xl mx-auto">
+    <div class="reveal">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">Prêt à lancer votre site ?</h2>
+      <p class="text-gray-500 mb-8">Remplissez le formulaire en 2 minutes — je vous recontacte sous 24h.</p>
+      <a href="/devis"
+        class="btn-primary inline-flex items-center justify-center bg-indigo-600 text-white font-bold px-8 py-4 rounded-xl text-base shadow-lg shadow-indigo-200">
+        Demander mon site →
+      </a>
     </div>
-
-    <form method="POST" action="/#contact" class="reveal bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-6">
-      <!-- Nom / Prénom -->
-      <div class="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Prénom <span class="text-red-400">*</span></label>
-          <input type="text" name="prenom" required placeholder="Jean"
-            class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Nom <span class="text-red-400">*</span></label>
-          <input type="text" name="nom" required placeholder="Dupont"
-            class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent">
-        </div>
-      </div>
-
-      <!-- Nom du commerce -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Nom de votre commerce <span class="text-red-400">*</span></label>
-        <input type="text" name="nom_commerce" required placeholder="Ex: Barbershop Le Grand"
-          class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent">
-      </div>
-
-      <!-- Type de commerce -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Type de commerce <span class="text-red-400">*</span></label>
-        <select name="type_commerce" required
-          class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white appearance-none">
-          <option value="" disabled selected>Choisissez...</option>
-          {% for t in types_commerce %}
-          <option value="{{ t }}">{{ t }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <!-- Email / Téléphone -->
-      <div class="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Email <span class="text-red-400">*</span></label>
-          <input type="email" name="email" required placeholder="jean@moncommerce.be"
-            class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Téléphone <span class="text-red-400">*</span></label>
-          <input type="tel" name="telephone" required placeholder="+32 470 00 00 00"
-            class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent">
-        </div>
-      </div>
-
-      <!-- Message -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Quelque chose à ajouter ? <span class="text-gray-400 font-normal">(optionnel)</span></label>
-        <textarea name="message" rows="3" placeholder="Ex: J'ai déjà un logo, j'aimerais une couleur bleue, je reçois ~20 clients/semaine..."
-          class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent resize-none"></textarea>
-      </div>
-
-      <button type="submit"
-        class="btn-primary w-full bg-indigo-600 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-200 text-sm">
-        Envoyer ma demande →
-      </button>
-
-      <p class="text-center text-xs text-gray-400">Je vous réponds sous 24h. Aucun engagement, aucune carte bancaire.</p>
-    </form>
   </div>
 </section>
 

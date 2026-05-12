@@ -95,4 +95,5 @@ class Lead(db.Model):
     type_commerce = db.Column(db.String(100), nullable=False)
     message = db.Column(db.Text, nullable=True)
     lu = db.Column(db.Boolean, default=False)
+    converti = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))

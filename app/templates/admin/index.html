@@ -92,11 +92,19 @@
               </td>
               <td class="px-6 py-4 text-gray-400 text-xs whitespace-nowrap">{{ lead.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
               <td class="px-6 py-4">
-                <div class="flex items-center gap-2">
-                  {% if not lead.lu %}
-                    <form method="POST" action="{{ url_for('admin.mark_lead_lu', lead_id=lead.id) }}">
-                      <button type="submit" class="text-xs text-indigo-600 hover:underline font-medium whitespace-nowrap">Marquer lu</button>
-                    </form>
+                <div class="flex items-center gap-2 flex-wrap">
+                  {% if lead.converti %}
+                    <span class="text-xs bg-green-50 text-green-700 px-2 py-1 rounded-lg font-medium">Converti ✓</span>
+                  {% else %}
+                    <button onclick="document.getElementById('modal-{{ lead.id }}').classList.remove('hidden')"
+                      class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1 rounded-lg font-medium transition whitespace-nowrap">
+                      Créer le compte
+                    </button>
+                    {% if not lead.lu %}
+                      <form method="POST" action="{{ url_for('admin.mark_lead_lu', lead_id=lead.id) }}">
+                        <button type="submit" class="text-xs text-gray-400 hover:text-gray-600 hover:underline font-medium whitespace-nowrap">Marquer lu</button>
+                      </form>
+                    {% endif %}
                   {% endif %}
                   <form method="POST" action="{{ url_for('admin.delete_lead', lead_id=lead.id) }}"
                     onsubmit="return confirm('Supprimer ce lead ?')">
@@ -105,6 +113,52 @@
                 </div>
               </td>
             </tr>
+
+            <!-- MODAL CRÉER COMPTE -->
+            {% if not lead.converti %}
+            <div id="modal-{{ lead.id }}" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+              <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+                <div class="flex items-start justify-between mb-5">
+                  <div>
+                    <h3 class="font-semibold text-gray-900 text-base">Créer le compte</h3>
+                    <p class="text-sm text-gray-500 mt-0.5">{{ lead.prenom }} {{ lead.nom }} — {{ lead.nom_commerce }}</p>
+                  </div>
+                  <button onclick="document.getElementById('modal-{{ lead.id }}').classList.add('hidden')"
+                    class="text-gray-300 hover:text-gray-500 transition mt-0.5">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+                </div>
+                <form method="POST" action="{{ url_for('admin.convertir_lead', lead_id=lead.id) }}" class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Email de connexion</label>
+                    <input type="email" name="email" required value="{{ lead.email }}"
+                      class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Mot de passe</label>
+                    <input type="text" name="password" required placeholder="Min. 8 caractères"
+                      class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent">
+                  </div>
+                  <div class="bg-gray-50 rounded-xl p-3 text-xs text-gray-500 space-y-0.5">
+                    <p><span class="font-medium text-gray-700">Commerce :</span> {{ lead.nom_commerce }}</p>
+                    <p><span class="font-medium text-gray-700">Type :</span> {{ lead.type_commerce }}</p>
+                    <p><span class="font-medium text-gray-700">Tél :</span> {{ lead.telephone }}</p>
+                  </div>
+                  <div class="flex gap-3 pt-1">
+                    <button type="submit"
+                      class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl text-sm transition">
+                      Créer le compte →
+                    </button>
+                    <button type="button" onclick="document.getElementById('modal-{{ lead.id }}').classList.add('hidden')"
+                      class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-xl text-sm transition">
+                      Annuler
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            {% endif %}
+
             {% endfor %}
           </tbody>
         </table>

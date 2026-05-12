@@ -1,7 +1,15 @@
 import os
+import re
 from flask import Blueprint, render_template, redirect, url_for, request, flash, session
 from ..models import User, Business, Reservation, Lead
 from .. import db
+
+
+def slugify(text):
+    text = text.lower().strip()
+    text = re.sub(r'[^\w\s-]', '', text)
+    text = re.sub(r'[\s_-]+', '-', text)
+    return text
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -68,6 +76,48 @@ def mark_lead_lu(lead_id):
     lead = Lead.query.get_or_404(lead_id)
     lead.lu = True
     db.session.commit()
+    return redirect(url_for('admin.index') + '#leads')
+
+
+@admin_bp.route('/admin/lead/<int:lead_id>/convertir', methods=['POST'])
+@admin_required
+def convertir_lead(lead_id):
+    lead = Lead.query.get_or_404(lead_id)
+    email = request.form.get('email', '').strip().lower()
+    password = request.form.get('password', '')
+
+    if not email or not password:
+        flash('Email et mot de passe requis.', 'error')
+        return redirect(url_for('admin.index') + '#leads')
+
+    if len(password) < 8:
+        flash('Le mot de passe doit faire au moins 8 caractères.', 'error')
+        return redirect(url_for('admin.index') + '#leads')
+
+    if User.query.filter_by(email=email).first():
+        flash('Cet email est déjà utilisé par un autre compte.', 'error')
+        return redirect(url_for('admin.index') + '#leads')
+
+    slug = slugify(lead.nom_commerce)
+    base_slug = slug
+    counter = 1
+    while User.query.filter_by(slug=slug).first():
+        slug = f'{base_slug}-{counter}'
+        counter += 1
+
+    user = User(email=email, slug=slug)
+    user.set_password(password)
+    db.session.add(user)
+    db.session.flush()
+
+    business = Business(user_id=user.id, nom=lead.nom_commerce)
+    db.session.add(business)
+
+    lead.converti = True
+    lead.lu = True
+    db.session.commit()
+
+    flash(f'Compte créé pour {lead.prenom} {lead.nom} — {lead.nom_commerce}. Slug : /{slug}', 'success')
     return redirect(url_for('admin.index') + '#leads')
 
 

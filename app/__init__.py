@@ -36,6 +36,21 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 
 
+def _migrate(db):
+    """Add missing columns to existing tables without Alembic."""
+    engine = db.engine
+    migrations = [
+        ("businesses", "domain_souhaite", "VARCHAR(100)"),
+    ]
+    with engine.connect() as conn:
+        for table, col, col_type in migrations:
+            try:
+                conn.execute(db.text(f"ALTER TABLE {table} ADD COLUMN {col} {col_type}"))
+                conn.commit()
+            except Exception:
+                pass
+
+
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
 
@@ -72,6 +87,7 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+        _migrate(db)
 
     app.wsgi_app = CustomDomainMiddleware(app.wsgi_app, app)
 

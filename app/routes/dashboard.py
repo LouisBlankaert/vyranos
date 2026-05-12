@@ -207,20 +207,20 @@ def delete_blocage(bid):
 def domaine():
     b = current_user.business
     if request.method == 'POST':
-        raw = request.form.get('custom_domain', '').strip().lower()
-        domain = raw.replace('https://', '').replace('http://', '').replace('www.', '').strip('/')
-        if domain:
-            existing = Business.query.filter(Business.custom_domain == domain, Business.id != b.id).first()
-            if existing:
-                flash('Ce domaine est déjà utilisé par un autre compte.', 'error')
-            else:
-                b.custom_domain = domain
-                db.session.commit()
-                flash('Domaine enregistré. Pensez à configurer votre CNAME.', 'success')
-        else:
-            b.custom_domain = None
+        action = request.form.get('action', 'request')
+        if action == 'cancel':
+            b.domain_souhaite = None
             db.session.commit()
-            flash('Domaine personnalisé retiré.', 'success')
+            flash('Demande de domaine annulée.', 'success')
+        else:
+            raw = request.form.get('domain_souhaite', '').strip().lower()
+            domain = raw.replace('https://', '').replace('http://', '').replace('www.', '').strip('/')
+            if domain:
+                b.domain_souhaite = domain
+                db.session.commit()
+                flash('Votre demande a été envoyée. Nous vous contacterons sous 24h.', 'success')
+            else:
+                flash('Veuillez entrer un nom de domaine.', 'error')
     return render_template('dashboard/domaine.html', business=b)
 
 

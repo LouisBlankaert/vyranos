@@ -40,6 +40,7 @@ class Business(db.Model):
     horaires = db.Column(db.JSON, default=dict)
     creneau_step = db.Column(db.Integer, default=30)
     custom_domain = db.Column(db.String(100), unique=True, nullable=True)
+    domain_souhaite = db.Column(db.String(100), nullable=True)
 
     services = db.relationship('Service', backref='business', lazy=True, cascade='all, delete-orphan')
     reservations = db.relationship('Reservation', backref='business', lazy=True, cascade='all, delete-orphan')

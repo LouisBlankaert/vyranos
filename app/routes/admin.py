@@ -159,6 +159,7 @@ def set_domaine(user_id):
             flash('Ce domaine est déjà utilisé par un autre client.', 'error')
         else:
             user.business.custom_domain = domain
+            user.business.domain_souhaite = None
             db.session.commit()
             flash(f'Domaine {domain} activé pour {user.business.nom}.', 'success')
     else:

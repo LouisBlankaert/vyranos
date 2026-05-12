@@ -14,48 +14,10 @@ def slugify(text):
     return text
 
 
-@auth_bp.route('/signup', methods=['GET', 'POST'])
+@auth_bp.route('/signup')
 def signup():
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard.index'))
-
-    if request.method == 'POST':
-        email = request.form.get('email', '').strip().lower()
-        password = request.form.get('password', '')
-        nom_commerce = request.form.get('nom_commerce', '').strip()
-
-        if not email or not password or not nom_commerce:
-            flash('Tous les champs sont requis.', 'error')
-            return render_template('auth/signup.html')
-
-        if len(password) < 8:
-            flash('Le mot de passe doit faire au moins 8 caractères.', 'error')
-            return render_template('auth/signup.html')
-
-        if User.query.filter_by(email=email).first():
-            flash('Cet email est déjà utilisé.', 'error')
-            return render_template('auth/signup.html')
-
-        slug = slugify(nom_commerce)
-        base_slug = slug
-        counter = 1
-        while User.query.filter_by(slug=slug).first():
-            slug = f'{base_slug}-{counter}'
-            counter += 1
-
-        user = User(email=email, slug=slug)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.flush()
-
-        business = Business(user_id=user.id, nom=nom_commerce)
-        db.session.add(business)
-        db.session.commit()
-
-        login_user(user)
-        return redirect(url_for('dashboard.index'))
-
-    return render_template('auth/signup.html')
+    flash('Les comptes sont créés manuellement. Contactez-nous via le site pour démarrer votre projet.', 'info')
+    return redirect(url_for('auth.login'))
 
 
 @auth_bp.route('/login', methods=['GET', 'POST'])

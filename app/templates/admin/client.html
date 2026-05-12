@@ -57,46 +57,63 @@
 
     <!-- DOMAINE PERSONNALISÉ -->
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="font-semibold text-gray-900">Domaine personnalisé</h2>
-      </div>
+      <h2 class="font-semibold text-gray-900 mb-4">Domaine personnalisé</h2>
       {% if client.business %}
-      <form method="POST" action="{{ url_for('admin.set_domaine', user_id=client.id) }}" class="flex gap-3 mb-5">
-        <input type="text" name="custom_domain"
-          value="{{ client.business.custom_domain or '' }}"
-          placeholder="ex : moncommerce.be"
-          class="flex-1 rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-mono">
-        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition flex-shrink-0">
-          Enregistrer
-        </button>
-        {% if client.business.custom_domain %}
-        <button type="submit" name="custom_domain" value=""
-          class="border border-gray-200 hover:border-red-200 hover:text-red-500 text-gray-400 px-4 py-2.5 rounded-xl text-sm transition flex-shrink-0">
-          Retirer
-        </button>
-        {% endif %}
-      </form>
-      {% if client.business.custom_domain %}
-      <div class="bg-gray-50 rounded-xl p-4 text-sm">
-        <p class="font-medium text-gray-700 mb-3">Checklist configuration</p>
-        <div class="space-y-2 text-gray-500">
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" class="rounded"> Domaine acheté
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" class="rounded"> CNAME configuré chez le registrar (<code class="text-xs bg-gray-200 px-1 py-0.5 rounded">@ → vyranos.app</code>)
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" class="rounded"> Domaine ajouté dans Railway (Settings → Networking → Custom Domain)
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" class="rounded"> HTTPS actif — domaine testé ✓
-          </label>
+
+        {% if client.business.domain_souhaite and not client.business.custom_domain %}
+        <!-- DEMANDE EN ATTENTE -->
+        <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-4 flex items-center gap-3">
+          <span class="text-amber-500 text-lg flex-shrink-0">⏳</span>
+          <div>
+            <p class="text-sm font-semibold text-amber-800">Demande client en attente</p>
+            <p class="text-sm text-amber-700">Le client souhaite : <code class="bg-amber-100 px-1.5 py-0.5 rounded font-mono text-xs">{{ client.business.domain_souhaite }}</code></p>
+          </div>
         </div>
-      </div>
-      {% else %}
-      <p class="text-sm text-gray-400">Aucun domaine configuré pour ce client.</p>
-      {% endif %}
+        {% elif client.business.custom_domain %}
+        <div class="bg-green-50 border border-green-100 rounded-xl px-4 py-3 mb-4 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></span>
+          <p class="text-sm text-green-700">Domaine actif : <strong class="font-mono">{{ client.business.custom_domain }}</strong></p>
+        </div>
+        {% else %}
+        <p class="text-sm text-gray-400 mb-4">Aucune demande de domaine pour ce client.</p>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('admin.set_domaine', user_id=client.id) }}" class="flex gap-3 mb-5">
+          <input type="text" name="custom_domain"
+            value="{{ client.business.custom_domain or client.business.domain_souhaite or '' }}"
+            placeholder="ex : moncommerce.be"
+            class="flex-1 rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-mono">
+          <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition flex-shrink-0">
+            Activer
+          </button>
+          {% if client.business.custom_domain %}
+          <button type="submit" name="custom_domain" value=""
+            class="border border-gray-200 hover:border-red-200 hover:text-red-500 text-gray-400 px-4 py-2.5 rounded-xl text-sm transition flex-shrink-0">
+            Retirer
+          </button>
+          {% endif %}
+        </form>
+
+        {% if client.business.custom_domain %}
+        <div class="bg-gray-50 rounded-xl p-4 text-sm">
+          <p class="font-medium text-gray-700 mb-3">Checklist configuration</p>
+          <div class="space-y-2 text-gray-500">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" class="rounded"> Domaine acheté / disponible vérifié
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" class="rounded"> CNAME configuré chez le registrar (<code class="text-xs bg-gray-200 px-1 py-0.5 rounded">@ → vyranos.app</code>)
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" class="rounded"> Domaine ajouté dans Railway (Settings → Networking → Custom Domain)
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" class="rounded"> HTTPS actif — domaine testé ✓
+            </label>
+          </div>
+        </div>
+        {% endif %}
+
       {% else %}
       <p class="text-sm text-gray-400">Le client n'a pas encore créé son commerce.</p>
       {% endif %}

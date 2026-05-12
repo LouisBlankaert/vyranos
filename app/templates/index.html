@@ -2,14 +2,162 @@
 {% block title %}Vyranos — Votre site sur mesure{% endblock %}
 {% block body %}
 
+<style>
+  /* ── Hero entrance ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero-badge { animation: fadeUp .6s cubic-bezier(.16,1,.3,1) both; animation-delay: .05s; }
+  .hero-h1    { animation: fadeUp .65s cubic-bezier(.16,1,.3,1) both; animation-delay: .18s; }
+  .hero-sub   { animation: fadeUp .65s cubic-bezier(.16,1,.3,1) both; animation-delay: .32s; }
+  .hero-ctas  { animation: fadeUp .65s cubic-bezier(.16,1,.3,1) both; animation-delay: .46s; }
+
+  /* ── Animated gradient title ── */
+  .gradient-text {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 40%, #06b6d4 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradShift 4s ease infinite;
+  }
+  @keyframes gradShift {
+    0%,100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+  }
+
+  /* ── Floating blobs ── */
+  @keyframes blobFloat {
+    0%,100% { transform: translate(0,0) scale(1); }
+    33%     { transform: translate(20px,-15px) scale(1.04); }
+    66%     { transform: translate(-12px,10px) scale(.97); }
+  }
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: .35;
+    pointer-events: none;
+    animation: blobFloat linear infinite;
+  }
+  .blob-1 { width:420px;height:420px;background:#a5b4fc;top:-80px;left:-100px; animation-duration:14s; }
+  .blob-2 { width:320px;height:320px;background:#c4b5fd;top:60px;right:-60px;  animation-duration:18s; animation-delay:-6s; }
+  .blob-3 { width:200px;height:200px;background:#67e8f9;bottom:0;left:40%;      animation-duration:11s; animation-delay:-3s; }
+
+  /* ── Scroll reveal ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── Feature cards ── */
+  .feat-card {
+    transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+  }
+  .feat-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 60% 0%, rgba(99,102,241,.07) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity .3s ease;
+    pointer-events: none;
+  }
+  .feat-card:hover { transform: translateY(-8px) scale(1.03); box-shadow: 0 24px 48px -16px rgba(99,102,241,.22); }
+  .feat-card:hover::before { opacity: 1; }
+  .feat-icon {
+    display: inline-block;
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  .feat-card:hover .feat-icon { transform: scale(1.28) rotate(-6deg); }
+
+  /* ── Steps scroll-driven ── */
+  .step-row {
+    transform-origin: left center;
+    will-change: transform, opacity;
+  }
+  .step-num {
+    transition: background-color .3s ease, box-shadow .3s ease;
+  }
+  .step-row.step-active .step-num {
+    box-shadow: 0 0 0 6px rgba(99,102,241,.15);
+  }
+
+  /* ── Step connector line ── */
+  .step-line {
+    width: 2px;
+    background: linear-gradient(to bottom, #6366f1, #e0e7ff);
+    margin-left: 19px;
+    height: 32px;
+  }
+
+  /* ── Section title underline ── */
+  .section-title {
+    position: relative;
+    display: inline-block;
+  }
+  .section-title::after {
+    content: '';
+    position: absolute;
+    left: 50%; bottom: -8px;
+    transform: translateX(-50%);
+    width: 0; height: 3px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    border-radius: 2px;
+    transition: width .6s cubic-bezier(.16,1,.3,1);
+  }
+  .reveal.visible .section-title::after { width: 48px; }
+
+  /* ── Buttons ── */
+  .btn-primary {
+    transition: transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .2s ease, background-color .15s ease;
+  }
+  .btn-primary:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 32px -6px rgba(99,102,241,.5);
+  }
+  .btn-primary:active { transform: translateY(0) scale(.98); }
+
+  .btn-secondary {
+    transition: transform .2s cubic-bezier(.34,1.56,.64,1), background-color .15s ease;
+  }
+  .btn-secondary:hover { transform: translateY(-2px); }
+  .btn-secondary:active { transform: translateY(0); }
+
+  /* ── Form inputs lift on focus ── */
+  .form-input {
+    transition: border-color .2s, box-shadow .2s, transform .2s cubic-bezier(.34,1.56,.64,1);
+  }
+  .form-input:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px -4px rgba(99,102,241,.18);
+  }
+
+  /* ── Nav scroll effect ── */
+  .nav-scrolled { box-shadow: 0 4px 24px -4px rgba(0,0,0,.08); }
+
+  /* ── Pulse dot ── */
+  @keyframes ping2 {
+    0%     { transform: scale(1); opacity: 1; }
+    75%,100% { transform: scale(2.2); opacity: 0; }
+  }
+  .dot-ping { animation: ping2 1.4s cubic-bezier(0,0,.2,1) infinite; }
+</style>
+
 <!-- NAV -->
-<nav class="fixed top-0 inset-x-0 z-40 bg-white/80 backdrop-blur border-b border-gray-100">
+<nav id="main-nav" class="fixed top-0 inset-x-0 z-40 bg-white/80 backdrop-blur border-b border-gray-100 transition-shadow duration-300">
   <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-    <span class="text-xl font-bold tracking-tight">Vyr<span class="text-indigo-600">anos</span></span>
+    <span class="text-xl font-bold tracking-tight">Vyr<span class="gradient-text">anos</span></span>
     <div class="flex items-center gap-4">
       <a href="/login" class="text-sm text-gray-500 hover:text-gray-900 transition">Espace commerçant</a>
       <a href="#contact"
-         class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition">
+         class="btn-primary text-sm bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium">
         Demander un devis
       </a>
     </div>
@@ -17,28 +165,51 @@
 </nav>
 
 <!-- HERO -->
-<section class="pt-36 pb-24 px-6 bg-white">
-  <div class="max-w-4xl mx-auto text-center">
-    <div class="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-      <span class="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
+<section class="relative pt-36 pb-28 px-6 bg-white overflow-hidden">
+  <!-- Blobs de fond -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <div class="relative max-w-4xl mx-auto text-center">
+    <div class="hero-badge inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
+      <span class="relative flex h-2 w-2">
+        <span class="dot-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+      </span>
       Sites sur mesure pour commerces locaux
     </div>
-    <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-gray-900 leading-tight mb-6">
+    <h1 class="hero-h1 text-5xl md:text-6xl font-bold tracking-tight text-gray-900 leading-tight mb-6">
       Votre page pro + réservations,<br>
-      <span class="text-indigo-600">fait pour vous.</span>
+      <span class="gradient-text">fait pour vous.</span>
     </h1>
-    <p class="text-xl text-gray-500 max-w-2xl mx-auto mb-10">
+    <p class="hero-sub text-xl text-gray-500 max-w-2xl mx-auto mb-10">
       Je crée votre site personnalisé avec un système de réservation intégré. Vous n'avez rien à faire — je m'occupe de tout.
     </p>
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+    <div class="hero-ctas flex flex-col sm:flex-row gap-4 justify-center">
       <a href="#contact"
-         class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition shadow-lg shadow-indigo-200">
+         class="btn-primary inline-flex items-center justify-center bg-indigo-600 text-white text-base font-semibold px-8 py-4 rounded-xl shadow-lg shadow-indigo-200">
         Demander mon site →
       </a>
       <a href="#comment-ca-marche"
-         class="inline-flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-800 text-base font-semibold px-8 py-4 rounded-xl transition">
+         class="btn-secondary inline-flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-800 text-base font-semibold px-8 py-4 rounded-xl">
         Comment ça marche
       </a>
+    </div>
+
+    <!-- Social proof mini -->
+    <div class="hero-ctas mt-12 flex items-center justify-center gap-6 text-sm text-gray-400">
+      <span class="flex items-center gap-1.5">
+        <span class="text-green-500 font-bold text-base">✓</span> Sans engagement
+      </span>
+      <span class="w-1 h-1 rounded-full bg-gray-200"></span>
+      <span class="flex items-center gap-1.5">
+        <span class="text-green-500 font-bold text-base">✓</span> Réponse sous 24h
+      </span>
+      <span class="w-1 h-1 rounded-full bg-gray-200"></span>
+      <span class="flex items-center gap-1.5">
+        <span class="text-green-500 font-bold text-base">✓</span> Livré en 14 jours
+      </span>
     </div>
   </div>
 </section>
@@ -46,8 +217,8 @@
 <!-- CE QUE VOUS OBTENEZ -->
 <section class="py-24 px-6 bg-gray-50">
   <div class="max-w-6xl mx-auto">
-    <h2 class="text-3xl font-bold text-center mb-4">Ce que vous obtenez</h2>
-    <p class="text-gray-500 text-center mb-16 max-w-xl mx-auto">Un site complet, livré clé en main. Vous gérez vos réservations, je m'occupe du reste.</p>
+    <div class="reveal text-center mb-4"><h2 class="text-3xl font-bold inline-block section-title">Ce que vous obtenez</h2></div>
+    <p class="reveal text-gray-500 text-center mb-16 max-w-xl mx-auto">Un site complet, livré clé en main. Vous gérez vos réservations, je m'occupe du reste.</p>
     <div class="grid md:grid-cols-3 gap-8">
       {% for feat in [
         ('🎨', 'Design sur mesure', 'Un site unique à votre image — couleurs, photos, typographie, identité visuelle. Rien de générique.'),
@@ -57,8 +228,8 @@
         ('🌐', 'Domaine personnalisé', 'Votre site accessible sur moncommerce.be — je m\'occupe de la configuration technique.'),
         ('⚡', 'Livraison rapide', 'Votre site en ligne en 7 à 14 jours. Vous validez, on ajuste, on publie.'),
       ] %}
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <div class="text-3xl mb-4">{{ feat[0] }}</div>
+      <div class="feat-card reveal bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div class="feat-icon text-3xl mb-4">{{ feat[0] }}</div>
         <h3 class="font-semibold text-lg mb-2">{{ feat[1] }}</h3>
         <p class="text-gray-500 text-sm leading-relaxed">{{ feat[2] }}</p>
       </div>
@@ -70,20 +241,26 @@
 <!-- COMMENT ÇA MARCHE -->
 <section id="comment-ca-marche" class="py-24 px-6 bg-white">
   <div class="max-w-3xl mx-auto">
-    <h2 class="text-3xl font-bold text-center mb-4">Comment ça marche</h2>
-    <p class="text-gray-500 text-center mb-16">Quatre étapes, zéro prise de tête.</p>
-    <div class="space-y-8">
-      {% for step in [
+    <div class="reveal text-center mb-4"><h2 class="text-3xl font-bold inline-block section-title">Comment ça marche</h2></div>
+    <p class="reveal text-gray-500 text-center mb-16">Quatre étapes, zéro prise de tête.</p>
+    <div id="steps-container" class="space-y-0">
+      {% set steps = [
         ('1', 'Vous remplissez le formulaire', 'Dites-moi qui vous êtes et ce que fait votre commerce. Ça prend 2 minutes.'),
         ('2', 'Je vous recontacte', 'On échange rapidement pour affiner votre projet et je vous prépare une première version.'),
         ('3', 'Vous validez', 'Je vous montre le résultat. On ajuste ensemble jusqu\'à ce que ce soit parfait.'),
         ('4', 'C\'est en ligne', 'Je publie votre site. Vos clients peuvent réserver dès maintenant.'),
       ] %}
-      <div class="flex gap-6 items-start">
-        <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white font-bold flex items-center justify-center flex-shrink-0 text-sm">
-          {{ step[0] }}
+      {% for step in steps %}
+      <div class="step-row flex gap-6 items-start pb-0">
+        <div class="flex flex-col items-center flex-shrink-0">
+          <div class="step-num w-10 h-10 rounded-xl bg-indigo-600 text-white font-bold flex items-center justify-center text-sm">
+            {{ step[0] }}
+          </div>
+          {% if not loop.last %}
+          <div class="step-line mt-2"></div>
+          {% endif %}
         </div>
-        <div>
+        <div class="pb-8">
           <h3 class="font-semibold text-gray-900 mb-1">{{ step[1] }}</h3>
           <p class="text-gray-500 text-sm leading-relaxed">{{ step[2] }}</p>
         </div>
@@ -96,23 +273,23 @@
 <!-- FORMULAIRE CONTACT -->
 <section id="contact" class="py-24 px-6 bg-gray-50">
   <div class="max-w-2xl mx-auto">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl font-bold text-gray-900 mb-3">Dites-moi tout sur votre commerce</h2>
-      <p class="text-gray-500">Je vous recontacte sous 24h pour discuter de votre projet, sans engagement.</p>
+    <div class="reveal text-center mb-12">
+      <h2 class="text-3xl font-bold text-gray-900 mb-3 inline-block section-title">Dites-moi tout sur votre commerce</h2>
+      <p class="text-gray-500 mt-4">Je vous recontacte sous 24h pour discuter de votre projet, sans engagement.</p>
     </div>
 
-    <form method="POST" action="/#contact" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-6">
+    <form method="POST" action="/#contact" class="reveal bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-6">
       <!-- Nom / Prénom -->
       <div class="grid sm:grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Prénom <span class="text-red-400">*</span></label>
           <input type="text" name="prenom" required placeholder="Jean"
-            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+            class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Nom <span class="text-red-400">*</span></label>
           <input type="text" name="nom" required placeholder="Dupont"
-            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+            class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent">
         </div>
       </div>
 
@@ -120,14 +297,14 @@
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1.5">Nom de votre commerce <span class="text-red-400">*</span></label>
         <input type="text" name="nom_commerce" required placeholder="Ex: Barbershop Le Grand"
-          class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+          class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent">
       </div>
 
       <!-- Type de commerce -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1.5">Type de commerce <span class="text-red-400">*</span></label>
         <select name="type_commerce" required
-          class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition bg-white appearance-none">
+          class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white appearance-none">
           <option value="" disabled selected>Choisissez...</option>
           {% for t in types_commerce %}
           <option value="{{ t }}">{{ t }}</option>
@@ -140,12 +317,12 @@
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Email <span class="text-red-400">*</span></label>
           <input type="email" name="email" required placeholder="jean@moncommerce.be"
-            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+            class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Téléphone <span class="text-red-400">*</span></label>
           <input type="tel" name="telephone" required placeholder="+32 470 00 00 00"
-            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+            class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent">
         </div>
       </div>
 
@@ -153,11 +330,11 @@
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1.5">Quelque chose à ajouter ? <span class="text-gray-400 font-normal">(optionnel)</span></label>
         <textarea name="message" rows="3" placeholder="Ex: J'ai déjà un logo, j'aimerais une couleur bleue, je reçois ~20 clients/semaine..."
-          class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition resize-none"></textarea>
+          class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent resize-none"></textarea>
       </div>
 
       <button type="submit"
-        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-xl transition shadow-lg shadow-indigo-200 text-sm">
+        class="btn-primary w-full bg-indigo-600 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-200 text-sm">
         Envoyer ma demande →
       </button>
 
@@ -172,5 +349,57 @@
   <span class="text-gray-200 mx-3">·</span>
   <a href="/login" class="text-xs text-gray-300 hover:text-gray-500 transition">Espace commerçant</a>
 </footer>
+
+<script>
+  /* ── Scroll reveal with stagger ── */
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const siblings = [...entry.target.parentElement.querySelectorAll('.reveal')];
+      const idx = siblings.indexOf(entry.target);
+      entry.target.style.transitionDelay = `${idx * 90}ms`;
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  /* ── Steps : scale piloté par la position scroll ── */
+  const stepRows = [...document.querySelectorAll('.step-row')];
+  function updateSteps() {
+    if (!stepRows.length) return;
+    const vh = window.innerHeight;
+    const focus = vh * 0.42; // point de focus : légèrement au-dessus du centre
+    stepRows.forEach(row => {
+      const rect = row.getBoundingClientRect();
+      const rowMid = rect.top + rect.height / 2;
+      const dist = Math.abs(focus - rowMid);
+      const maxDist = vh * 0.55;
+      const t = Math.max(0, 1 - dist / maxDist);
+      const scale = 0.82 + t * 0.18;       // 0.82 → 1.00
+      const opacity = 0.35 + t * 0.65;     // 0.35 → 1.00
+      row.style.transform = `scale(${scale.toFixed(3)})`;
+      row.style.opacity = opacity.toFixed(3);
+      row.classList.toggle('step-active', t > 0.7);
+    });
+  }
+  updateSteps();
+  window.addEventListener('scroll', updateSteps, { passive: true });
+
+  /* ── Nav shadow on scroll ── */
+  const nav = document.getElementById('main-nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('nav-scrolled', window.scrollY > 20);
+  }, { passive: true });
+
+  /* ── Subtle parallax on hero blobs ── */
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    document.querySelectorAll('.blob').forEach((b, i) => {
+      const dir = i % 2 === 0 ? 1 : -1;
+      b.style.transform = `translateY(${y * dir * 0.08}px)`;
+    });
+  }, { passive: true });
+</script>
 
 {% endblock %}
